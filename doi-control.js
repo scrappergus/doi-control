@@ -20,12 +20,14 @@ Template.generator_form.events({
             if(err) {
                 console.error(err);
             } else {
+                var containNode = document.createElement("div");
                 var statusLinkNode = document.createElement("a");
                 statusLinkNode.href = "http://api.crossref.org" + data.location;
                 statusLinkNode.innerText = "Deposit status: " + data.location;
                 var xmlTextNode = document.createTextNode("\n\n" + data.xml);
-                document.getElementById("xmlbox").appendChild(statusLinkNode);
-                document.getElementById("xmlbox").appendChild(xmlTextNode);
+                containNode.appendChild(statusLinkNode);
+                containNode.appendChild(xmlTextNode);
+                document.getElementById("xmlbox").innerHTML = containNode.innerHTML;
             }
         });
     }
