@@ -3,12 +3,18 @@
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
+  <h1>DOI Control</h1>
 
-  {{> hello}}
+  {{> generator_form}}
 </body>
 
-<template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
+<template name="generator_form">
+    <form id="xml_generator">
+        <label for="volume">volume</label>
+        <input name="volume" type="text">
+        <label for="issue">issue</label>
+        <input name="issue" type="text">
+        <button>Generate XML</button>
+    </form>
+    <div id="xmlbox"></div>
 </template>

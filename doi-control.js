@@ -1,19 +1,22 @@
 if (Meteor.isClient) {
-  // counter starts at 0
-  Session.setDefault('counter', 0);
 
-  Template.hello.helpers({
-    counter: function () {
-      return Session.get('counter');
+Template.generator_form.events({
+    'submit form': function (e) {
+        e.preventDefault();
+        var volume = e.target.querySelector('[name="volume"]').value;
+        var issue = e.target.querySelector('[name="issue"]').value;
+
+        Meteor.call("generate_xml", volume, issue, function(err, data){
+            if(err) {
+                console.error(err);
+            } else {
+                var xmlTextNode = document.createTextNode(data);
+                document.getElementById("xmlbox").appendChild(xmlTextNode);
+            }
+        });
     }
   });
 
-  Template.hello.events({
-    'click button': function () {
-      // increment the counter when button is clicked
-      Session.set('counter', Session.get('counter') + 1);
-    }
-  });
 }
 
 if (Meteor.isServer) {

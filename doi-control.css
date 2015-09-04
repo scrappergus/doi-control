@@ -1,1 +1,15 @@
 /* CSS declarations go here */
+
+#xmlbox {
+	font-family: monospace;
+	white-space: pre;
+	background: #eee;
+	width: 500px;
+	height:500px;
+	overflow: auto;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	margin-top :20px;
+	padding: 10px;
+	font-size: 12px;
+}
