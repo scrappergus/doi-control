@@ -132,6 +132,20 @@ Meteor.methods({
 		massaged_json.head.doi_batch_id = batch_id;
 		var xml_from_json = js2xmlparser("doi-batch", massaged_json);
 
-		return xml_from_json;
+		var options = {
+			headers: {
+				"Authorization": "Basic " + Base64.encode(Meteor.settings.cr_cred_un + ":" + Meteor.settings.cr_cred_pw),
+				"Content-Type": "application/vnd.crossref.deposit+xml"
+			},
+			content: xml_from_json
+		};
+
+		var response = Meteor.http.call("POST", "https://api.crossref.org/deposits?test=true", options);
+
+		return {
+			code: response.statusCode,
+			location: (response.headers.location || ""),
+			xml: xml_from_json
+		};
 	}
 })
