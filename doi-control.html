@@ -1,20 +1,37 @@
 <head>
-  <title>doi-control</title>
+  <title>DOI Control</title>
 </head>
 
 <body>
-  <h1>DOI Control</h1>
-
+  {{>pageHeader header='DOI Control'}}
   {{> generator_form}}
 </body>
 
 <template name="generator_form">
-    <form id="xml_generator">
-        <label for="volume">volume</label>
-        <input name="volume" type="text">
-        <label for="issue">issue</label>
-        <input name="issue" type="text">
-        <button>Generate &amp; (test) Submit XML</button>
-    </form>
-    <div id="xmlbox"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col s12">
+        <div class="card">
+          <div class="card-content">
+            <form id="xml_generator">
+                <label for="volume">volume</label>
+                <input name="volume" type="text">
+                <label for="issue">issue</label>
+                <input name="issue" type="text">
+                <button class="waves-effect waves-light btn btn-large green">Generate &amp; (test) Submit XML</button>
+            </form>
+            <div id="xmlbox"></div>       
+          </div>
+        </div> 
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="pageHeader">
+  <div class="row">
+    <div class="col s12">
+      <h1>{{header}}</h1>
+    </div>
+  </div>
 </template>
