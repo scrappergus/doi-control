@@ -10,7 +10,9 @@
 <template name="generator_form">
   <div class="container">
     <div class="row">
-      <div class="col s12 hide" id="msg-error"></div>
+      <div class="col s12 hide center-align" id="msg-error">
+        <div class="badge red lighten-2" style="padding:10px 0"></div>
+      </div>
     </div>
     <div class="row">
       <div class="col s12">
@@ -23,11 +25,20 @@
                 <input name="issue" type="text">
                 <button class="waves-effect waves-light btn btn-large green">Generate &amp; (test) Submit XML</button>
             </form>      
-            <div id="xmlbox"></div>
           </div>
         </div> 
       </div>
     </div>
+    <div class="row hide" id="resp-xml">
+      <div class="col s12">
+        <div class="card">
+          <div class="card-content">
+            <div id="xmlbox"></div> 
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <template name="pageHeader">

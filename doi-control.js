@@ -19,7 +19,7 @@ Template.generator_form.events({
             if(err) {
                 console.error(err);
                 $('#msg-error').removeClass('hide');
-                $('#msg-error').html(err);
+                $('#msg-error > .badge').html('<h4>'+err.message+'</h4>');
             } else {
                 var containNode = document.createElement("div");
                 var statusLinkNode = document.createElement("a");
@@ -28,6 +28,7 @@ Template.generator_form.events({
                 var xmlTextNode = document.createTextNode("\n\n" + data.xml);
                 containNode.appendChild(statusLinkNode);
                 containNode.appendChild(xmlTextNode);
+                $('#resp-xml').removeClass('hide');
                 document.getElementById("xmlbox").innerHTML = containNode.innerHTML;
             }
         });
