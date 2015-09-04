@@ -13,3 +13,5 @@ meteorhacks:npm
 npm-container
 http
 base64
+materialize:materialize
+fourseven:scss
