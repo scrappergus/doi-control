@@ -16,9 +16,10 @@ Template.generator_form.events({
             // temp. "responsive ui"
             formButton.innerText = "Generate & (test) Submit XML";
             formButton.disabled = false;
-
             if(err) {
                 console.error(err);
+                $('#msg-error').removeClass('hide');
+                $('#msg-error').html(err);
             } else {
                 var containNode = document.createElement("div");
                 var statusLinkNode = document.createElement("a");
