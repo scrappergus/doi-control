@@ -50,7 +50,7 @@ Meteor.methods({
 					timestamp: timestamp,
 					depositor: {
 						depositor_name: "Impact Journals",
-						email_address: "support@oncotarget.com"
+						email_address: "gus@oncotarget.com"
 					},
 					registrant: "Impact Journals",
 					doi_batch_id: ""
