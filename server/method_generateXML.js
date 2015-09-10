@@ -67,7 +67,7 @@ Meteor.methods({
 								"@": {
 									media_type: "electronic"
 								},
-								value: "1949-2553"
+								"#": "1949-2553"
 							},
 							doi_data: {
 								doi: "10.18632.oncotarget",
@@ -108,14 +108,16 @@ Meteor.methods({
 						last_page: current_article_data.last_page
 					},
 					doi_data: {
-						doi: "10.18632.oncotarget."+current_article_data.pii
+						doi: "10.18632.oncotarget."+current_article_data.pii,
+						timestamp: timestamp,
+						resource: "http://oncotarget.com/abstract/"+current_article_data.pii
 					},
 					publisher_item: {
 						identifier: {
 							"@": {
 								id_type: "pii"
 							},
-							"value": current_article_data.pii
+							"#": current_article_data.pii
 						}
 					}
 				};
@@ -132,19 +134,8 @@ Meteor.methods({
 		massaged_json.head.doi_batch_id = batch_id;
 		var xml_from_json = js2xmlparser("doi-batch", massaged_json);
 
-		var options = {
-			headers: {
-				"Authorization": "Basic " + Base64.encode(Meteor.settings.cr_cred_un + ":" + Meteor.settings.cr_cred_pw),
-				"Content-Type": "application/vnd.crossref.deposit+xml"
-			},
-			content: xml_from_json
-		};
-
-		var response = Meteor.http.call("POST", "https://api.crossref.org/deposits?test=true", options);
-
 		return {
-			code: response.statusCode,
-			location: (response.headers.location || ""),
+			json_string: JSON.stringify(massaged_json),
 			xml: xml_from_json
 		};
 	}
