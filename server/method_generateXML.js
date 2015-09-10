@@ -133,7 +133,7 @@ Meteor.methods({
 		var massaged_json = massage_json_to_crossref_schema(journal_json);
 		var batch_id = DOIBatches.insert({crossref_data:massaged_json});
 		massaged_json.head.doi_batch_id = batch_id;
-		var xml_from_json = js2xmlparser("doi-batch", massaged_json);
+		var xml_from_json = js2xmlparser("doi_batch", massaged_json);
 
 		return {
 			json_string: JSON.stringify(massaged_json),
