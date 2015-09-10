@@ -12,7 +12,8 @@ Meteor.methods({
 			content: xml_from_json
 		};
 
-		var response = Meteor.http.call("POST", "https://api.crossref.org/deposits", options);
+		var encoded_pingback = encodeURIComponent("doi.oncotarget.com/deposit_pingback");
+		var response = Meteor.http.call("POST", "https://api.crossref.org/deposits?pingback="+encoded_pingback, options);
 
 		return {
 			code: response.statusCode,

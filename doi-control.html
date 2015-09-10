@@ -3,9 +3,26 @@
 </head>
 
 <body>
-  {{>pageHeader header='DOI Control'}}
-  {{> generator_form}}
 </body>
+
+<template name="home">
+    {{>pageHeader header='DOI Control'}}
+    {{> generator_form}}
+</template>
+
+<template name="awareness">
+    {{>pageHeader header='DOI Control'}}
+    <div class="container">
+        {{#each pings}}
+            <div class="row">
+                <div class="col s12">
+                    {{request}}
+                </div>
+                <hr>
+            </div>
+        {{/each}}
+    </div>
+</template>
 
 <template name="generator_form">
   <div class="container">
