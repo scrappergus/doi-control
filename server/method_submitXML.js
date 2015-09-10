@@ -12,7 +12,7 @@ Meteor.methods({
 			content: xml_from_json
 		};
 
-		var response = Meteor.http.call("POST", "https://api.crossref.org/deposits?test=true", options);
+		var response = Meteor.http.call("POST", "https://api.crossref.org/deposits", options);
 
 		return {
 			code: response.statusCode,
