@@ -95,7 +95,7 @@ Meteor.methods({
 				var current_article_data = json_data.articles[i];
 				var new_article_element = {
 					"@": {
-						publication_type: "full-text"
+						publication_type: (current_article_data.full_text_available ? "full_text" : "abstract_only")
 					},
 					titles: {
 						title: current_article_data.title
