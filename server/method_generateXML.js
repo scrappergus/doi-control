@@ -50,7 +50,7 @@ Meteor.methods({
 					timestamp: timestamp,
 					depositor: {
 						depositor_name: "Impact Journals",
-						email_address: "impactjournals@change.this.please"
+						email_address: "support@oncotarget.com"
 					},
 					registrant: "Impact Journals",
 					doi_batch_id: ""
@@ -82,7 +82,8 @@ Meteor.methods({
 							issue: json_data.issue.number,
 							publication_date: generate_publication_date(json_data.issue.date_published),
 							doi_data: {
-								doi: "10.18632.oncotarget.v"+json_data.issue.volume+"i"+json_data.issue.number
+								doi: "10.18632.oncotarget.v"+json_data.issue.volume+"i"+json_data.issue.number,
+								resource: "http://oncotarget.com/issue/v"+json_data.issue.volume+"i"+json_data.issue.number
 							}
 						},
 						journal_article: []
