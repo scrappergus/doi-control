@@ -15,6 +15,7 @@ if (Meteor.isClient) {
             formButton.innerText = "Generating...";
             formButton.disabled = true;
 
+
             Meteor.call("generate_xml", volume, issue, function(err, data){
 
                 // temp. "responsive ui"
@@ -26,12 +27,25 @@ if (Meteor.isClient) {
                     $('#msg-error > .badge').html('<h4>'+err.message+'</h4>');
                 } else {
                     window.app_data['json_data_string'] = data.json_string;
-                    var containNode = document.createElement("div");
-                    var xmlTextNode = document.createTextNode("\n\n" + data.xml);
-                    containNode.appendChild(xmlTextNode);
+//                    var containNode = document.createElement("div");
+//                    var xmlTextNode = document.createTextNode("\n\n" + data.xml);
+//                    containNode.appendChild(xmlTextNode);
                     $('#resp-xml').removeClass('hide');
-                    document.getElementById("xmlbox").innerHTML = containNode.innerHTML;
+                    $("#xmlbox").append("<textarea class=\"xml-textarea\" style=\"height:400px\">"+data.xml+"</textarea>");
                     document.getElementById("submitJSONasXML").style.display = "block";
+
+
+                    $(".xml-textarea").click(function() {
+                            var $this = $(this);
+                            $this.select();
+
+                            // Work around Chrome's little problem
+                            $this.mouseup(function() {
+                                    // Prevent further mouseup intervention
+                                    $this.unbind("mouseup");
+                                    return false;
+                                });
+                        });
                 }
             });
         },

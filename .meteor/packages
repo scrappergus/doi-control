@@ -17,3 +17,4 @@ materialize:materialize
 fourseven:scss
 cfs:http-methods
 iron:router
+jquery
