@@ -34,7 +34,7 @@ Meteor.methods({
 					media_type: "online"
 				},
 				month: localTimeDate.getMonth()+1,
-				day: localTimeDate.getDay(),
+				day: localTimeDate.getDay()+1,
 				year: localTimeDate.getFullYear()
 			}
 			return pubdate_oject;
