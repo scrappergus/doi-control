@@ -2,7 +2,7 @@ Meteor.methods({
 	submit_JSON_string_as_XML: function(json_string) {
 		var js2xmlparser = Meteor.npmRequire("js2xmlparser");
 
-		var xml_from_json = js2xmlparser("doi-batch", JSON.parse(json_string));
+		var xml_from_json = js2xmlparser("doi_batch", JSON.parse(json_string));
 
 		var options = {
 			headers: {

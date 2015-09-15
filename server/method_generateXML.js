@@ -30,9 +30,12 @@ Meteor.methods({
 			var date = new Date(datestring);
 			var localTimeDate = new Date(date.getTime() + (date.getTimezoneOffset() * 6000));
 			var pubdate_oject = {
-				year: localTimeDate.getFullYear(),
-				month: localTimeDate.getMonth(),
-				day: localTimeDate.getDay()
+				"@": {
+					media_type: "online"
+				},
+				month: localTimeDate.getMonth()+1,
+				day: localTimeDate.getDay(),
+				year: localTimeDate.getFullYear()
 			}
 			return pubdate_oject;
 		}
@@ -44,16 +47,16 @@ Meteor.methods({
 					version: "4.3.6",
 					xmlns: "http://www.crossref.org/schema/4.3.6",
 					"xmlns:xsi" : "http://www.w3.org/2001/XMLSchema-instance",
-					"xsi:schemaLocation": "http://www.crossref.org/schema/4.3.6 http://www.crossref.org /schema/4.3.6/crossref.xsd"
+					"xsi:schemaLocation": "http://www.crossref.org/schema/4.3.6 http://www.crossref.org/schemas/crossref4.3.6.xsd"
 				},
 				head: {
+					doi_batch_id: "",
 					timestamp: timestamp,
 					depositor: {
 						depositor_name: "Impact Journals",
 						email_address: "gus@oncotarget.com"
 					},
-					registrant: "Impact Journals",
-					doi_batch_id: ""
+					registrant: "Impact Journals"
 				},
 				body: {
 					journal: {
@@ -70,19 +73,19 @@ Meteor.methods({
 								"#": "1949-2553"
 							},
 							doi_data: {
-								doi: "10.18632.oncotarget",
+								doi: "10.18632/oncotarget",
 								timestamp: timestamp,
 								resource: "http://oncotarget.com"
 							}
 						},
 						journal_issue: {
+							publication_date: generate_publication_date(json_data.issue.date_published),
 							journal_volume: {
 								volume: json_data.issue.volume
 							},
 							issue: json_data.issue.number,
-							publication_date: generate_publication_date(json_data.issue.date_published),
 							doi_data: {
-								doi: "10.18632.oncotarget.v"+json_data.issue.volume+"i"+json_data.issue.number,
+								doi: "10.18632/oncotarget.v"+json_data.issue.volume+"i"+json_data.issue.number,
 								resource: "http://oncotarget.com/issue/v"+json_data.issue.volume+"i"+json_data.issue.number
 							}
 						},
@@ -108,11 +111,6 @@ Meteor.methods({
 						first_page: current_article_data.first_page,
 						last_page: current_article_data.last_page
 					},
-					doi_data: {
-						doi: "10.18632.oncotarget."+current_article_data.pii,
-						timestamp: timestamp,
-						resource: "http://oncotarget.com/abstract/"+current_article_data.pii
-					},
 					publisher_item: {
 						identifier: {
 							"@": {
@@ -120,6 +118,11 @@ Meteor.methods({
 							},
 							"#": current_article_data.pii
 						}
+					},
+					doi_data: {
+						doi: "10.18632/oncotarget."+current_article_data.pii,
+						timestamp: timestamp,
+						resource: "http://oncotarget.com/abstract/"+current_article_data.pii
 					}
 				};
 
