@@ -40,6 +40,12 @@ Meteor.methods({
 			return pubdate_oject;
 		}
 
+        function fix_allowed_tags(str) {
+            re_em = /<(\/?)em\b((?:[^>"']|"[^"]*"|'[^']*')*)>/g;
+            re_strong = /<(\/?)strong\b((?:[^>"']|"[^"]*"|'[^']*')*)>/g; 
+            return str.replace(re_em, "<$1i>").replace(re_strong, "<$1b>");
+        }
+
 		function massage_json_to_crossref_schema(json_data) {
 			var timestamp = Date.now();
 			var top_level = {
@@ -101,7 +107,7 @@ Meteor.methods({
 						publication_type: (current_article_data.full_text_available ? "full_text" : "abstract_only")
 					},
 					titles: {
-						title: current_article_data.title
+                        title: fix_allowed_tags(current_article_data.title)
 					},
 					contributors: {
 						person_name: generate_personnames(current_article_data.authors)
