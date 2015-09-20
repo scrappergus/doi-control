@@ -28,13 +28,14 @@ Meteor.methods({
 
 		function generate_publication_date(datestring) {
 			var date = new Date(datestring);
-			var localTimeDate = new Date(date.getTime() + (date.getTimezoneOffset() * 6000));
+			var localTimeDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
+
 			var pubdate_oject = {
 				"@": {
 					media_type: "online"
 				},
 				month: localTimeDate.getMonth()+1,
-				day: localTimeDate.getDay()+1,
+				day: localTimeDate.getDate(),
 				year: localTimeDate.getFullYear()
 			}
 			return pubdate_oject;
