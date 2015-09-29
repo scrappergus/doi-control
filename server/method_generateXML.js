@@ -85,21 +85,26 @@ Meteor.methods({
 								resource: "http://oncotarget.com"
 							}
 						},
-						journal_issue: {
-							publication_date: generate_publication_date(json_data.issue.date_published),
-							journal_volume: {
-								volume: json_data.issue.volume
-							},
-							issue: json_data.issue.number,
-							doi_data: {
-								doi: "10.18632/oncotarget.v"+json_data.issue.volume+"i"+json_data.issue.number,
-								resource: "http://oncotarget.com/issue/v"+json_data.issue.volume+"i"+json_data.issue.number
-							}
-						},
 						journal_article: []
 					}
 				}
 			};
+
+
+            if(json_data.issue.number > 0) {
+                top_level['body']['journal']['journal_issue'] = {
+                    publication_date: generate_publication_date(json_data.issue.date_published),
+                    journal_volume: {
+                        volume: json_data.issue.volume
+                    },
+                    issue: json_data.issue.number,
+                    doi_data: {
+                        doi: "10.18632/oncotarget.v"+json_data.issue.volume+"i"+json_data.issue.number,
+                        resource: "http://oncotarget.com/issue/v"+json_data.issue.volume+"i"+json_data.issue.number
+                    }
+                }
+            }
+
 
 			for (var i = 0; i < json_data.articles.length; i++) {
 				var current_article_data = json_data.articles[i];
@@ -113,11 +118,7 @@ Meteor.methods({
 					contributors: {
 						person_name: generate_personnames(current_article_data.authors)
 					},
-					publication_date: generate_publication_date(current_article_data.issue_pubdate),
-					pages: {
-						first_page: current_article_data.first_page,
-						last_page: current_article_data.last_page
-					},
+                    publication_date: generate_publication_date(current_article_data.issue_pubdate),
 					publisher_item: {
 						identifier: {
 							"@": {
@@ -132,6 +133,14 @@ Meteor.methods({
 						resource: "http://oncotarget.com/abstract/"+current_article_data.pii
 					}
 				};
+
+
+                if(current_article_data.first_page) {
+                    new_article_element[pages] = {
+                        first_page: current_article_data.first_page
+                        ,last_page: current_article_data.last_page
+                    };
+                }
 
 				top_level.body.journal.journal_article.push(new_article_element);
 			}
