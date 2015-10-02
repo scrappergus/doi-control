@@ -31,7 +31,7 @@ if (Meteor.isClient) {
 //                    var xmlTextNode = document.createTextNode("\n\n" + data.xml);
 //                    containNode.appendChild(xmlTextNode);
                     $('#resp-xml').removeClass('hide');
-                    $("#xmlbox").append("<textarea class=\"xml-textarea\" style=\"height:400px\">"+data.xml+"</textarea>");
+                    $("#xmlbox").html("<textarea class=\"xml-textarea\" style=\"height:400px\">"+data.xml+"</textarea>");
                     document.getElementById("submitJSONasXML").style.display = "block";
 
 
@@ -50,6 +50,9 @@ if (Meteor.isClient) {
             });
         },
         'click button#submitJSONasXML': function (e) {
+            var submitButton = e.target;
+            submitButton.innerText = "Submitting...";
+            submitButton.disabled = true;
             Meteor.call("submit_JSON_string_as_XML", window.app_data.json_data_string, function(err, data) {
                 if(err) {
                     console.error(err);
