@@ -16,7 +16,7 @@ if (Meteor.isClient) {
             formButton.disabled = true;
 
 
-            Meteor.call("generate_xml", volume, issue, function(err, data){
+            Meteor.call("get_json_and_generate_xml", volume, issue, function(err, data){
 
                 // temp. "responsive ui"
                 formButton.innerText = "Generate XML";
