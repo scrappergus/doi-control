@@ -1,15 +1,43 @@
 Meteor.methods({
-	generate_xml: function(volume, issue) {
+	generate_xml_from_json: function(journal_name, journal_json) {
 		var js2xmlparser = Meteor.npmRequire("js2xmlparser");
 
+		var crossref_json = Meteor.call("massage_json_to_crossref_schema", journal_name, journal_json);
+
+		var batch_id = DOIBatches.insert({crossref_data:crossref_json});
+		crossref_json.head.doi_batch_id = batch_id;
+		var xml_from_json = js2xmlparser("doi_batch", crossref_json);
+
+		return {
+			json_string: JSON.stringify(crossref_json),
+			xml: xml_from_json
+		};
+	},
+	get_json_and_generate_xml: function(journal_name, volume, issue) {
+		var js2xmlparser = Meteor.npmRequire("js2xmlparser");
+
+		var journal_json = Meteor.call("get_journal_json", volume, issue);
+		var crossref_json = Meteor.call("massage_json_to_crossref_schema", journal_json);
+
+		var batch_id = DOIBatches.insert({crossref_data:crossref_json});
+		crossref_json.head.doi_batch_id = batch_id;
+		var xml_from_json = js2xmlparser("doi_batch", crossref_json);
+
+		return {
+			json_string: JSON.stringify(crossref_json),
+			xml: xml_from_json
+		};
+	},
+	massage_json_to_crossref_schema: function(journal_name, json_data) {
 		function generate_personnames(name_info_array) {
+			if(name_info_array == void 0 || name_info_array.length == 0) return null;
 			var personnames = [];
 			for (var i = 0; i < name_info_array.length; i++) {
 				var fn = name_info_array[i].first_name;
 				var mn = name_info_array[i].middle_name;
 				var ln = name_info_array[i].last_name;
 
-				var mn_exists = (mn != void 0 && mn != "");
+				var mn_exists = (mn != void 0 && mn != null && mn != "");
 
 				var pn = {
 					"@": {
@@ -27,6 +55,8 @@ Meteor.methods({
 		}
 
 		function generate_publication_date(datestring) {
+			if(datestring == void 0) return null;
+			console.log(datestring);
 			var date = new Date(datestring);
 			var localTimeDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
 
@@ -41,112 +71,157 @@ Meteor.methods({
 			return pubdate_oject;
 		}
 
-        function fix_allowed_tags(str) {
-            re_em = /<(\/?)em\b((?:[^>"']|"[^"]*"|'[^']*')*)>/g;
-            re_strong = /<(\/?)strong\b((?:[^>"']|"[^"]*"|'[^']*')*)>/g; 
-            return str.replace(re_em, "<$1i>").replace(re_strong, "<$1b>");
-        }
+		function fix_allowed_tags(str) {
+			re_em = /<(\/?)em\b((?:[^>"']|"[^"]*"|'[^']*')*)>/g;
+			re_strong = /<(\/?)strong\b((?:[^>"']|"[^"]*"|'[^']*')*)>/g;
+			return str.replace(re_em, "<$1i>").replace(re_strong, "<$1b>");
+		}
 
-		function massage_json_to_crossref_schema(json_data) {
-			var timestamp = Date.now();
-			var top_level = {
+		var timestamp = Date.now();
+		var metadata = {
+			"oncotarget": {
 				"@": {
-					version: "4.3.6",
-					xmlns: "http://www.crossref.org/schema/4.3.6",
-					"xmlns:xsi" : "http://www.w3.org/2001/XMLSchema-instance",
-					"xsi:schemaLocation": "http://www.crossref.org/schema/4.3.6 http://www.crossref.org/schemas/crossref4.3.6.xsd"
+					language: "en"
 				},
-				head: {
-					doi_batch_id: "",
-					timestamp: timestamp,
-					depositor: {
-						depositor_name: "Impact Journals",
-						email_address: "gus@oncotarget.com"
+				full_title: "Oncotarget",
+				abbrev_title: "Oncotarget",
+				issn: {
+					"@": {
+						media_type: "electronic"
 					},
-					registrant: "Impact Journals"
+					"#": "1949-2553"
 				},
-				body: {
-					journal: {
-						journal_metadata: {
-							"@": {
-								language: "en"
-							},
-							full_title: "Oncotarget",
-							abbrev_title: "Oncotarget",
-							issn: {
-								"@": {
-									media_type: "electronic"
-								},
-								"#": "1949-2553"
-							},
-							doi_data: {
-								doi: "10.18632/oncotarget",
-								timestamp: timestamp,
-								resource: "http://oncotarget.com"
-							}
+				doi_data: {
+					doi: "10.18632/oncotarget",
+					timestamp: timestamp,
+					resource: "http://oncotarget.com"
+				}
+			},
+			"oncoscience": {
+				"@": {
+					language: "en"
+				},
+				full_title: "Oncoscience",
+				abbrev_title: "Oncoscience",
+				issn: {
+					"@": {
+						media_type: "electronic"
+					},
+					"#": "2331-4737"
+				},
+				doi_data: {
+					doi: "10.18632/oncoscience",
+					timestamp: timestamp,
+					resource: "http://impactjournals.com/oncoscience/"
+				}
+			}
+		};
+
+		if(metadata[journal_name] == void 0) {
+			throw new Meteor.Error(500, "Incorrect journal_name passed to generate_xml: "+journal_name);
+		}
+
+		var top_level = {
+			"@": {
+				version: "4.3.6",
+				xmlns: "http://www.crossref.org/schema/4.3.6",
+				"xmlns:xsi" : "http://www.w3.org/2001/XMLSchema-instance",
+				"xsi:schemaLocation": "http://www.crossref.org/schema/4.3.6 http://www.crossref.org/schemas/crossref4.3.6.xsd"
+			},
+			head: {
+				doi_batch_id: "",
+				timestamp: timestamp,
+				depositor: {
+					depositor_name: "Impact Journals",
+					email_address: "gus@oncotarget.com"
+				},
+				registrant: "Impact Journals"
+			},
+			body: {
+				journal: {
+					journal_metadata: metadata[journal_name],
+					journal_article: []
+				}
+			}
+		};
+
+		if(json_data.issue != void 0) {
+			if(json_data.issue.number > 0) {
+				if(journal_name == "oncoscience") {
+					top_level['body']['journal_issue'] = {
+						publication_date: generate_publication_date(json_data.articles[json_data.articles.length - 1].date_published),
+						journal_volume: {
+							volume: json_data.issue.volume_idvolume
 						},
-						journal_article: []
+						issue: json_data.issue.number,
+						doi_data: {
+							doi: "10.18632/oncoscience.v"+json_data.issue.volume_idvolume+"i"+json_data.issue.num,
+							resource: "http://impactjournals.com/oncoscience/index.php?issue="+json_data.issue.idissues
+						}
+					};
+				}
+				if(journal_name == "oncotarget") {
+					top_level['body']['journal']['journal_issue'] = {
+						publication_date: generate_publication_date(json_data.issue.date_published),
+						journal_volume: {
+							volume: json_data.issue.volume
+						},
+						issue: json_data.issue.number,
+						doi_data: {
+							doi: "10.18632/oncotarget.v"+json_data.issue.volume+"i"+json_data.issue.number,
+							resource: "http://oncotarget.com/issue/v"+json_data.issue.volume+"i"+json_data.issue.number
+						}
 					}
+				}
+			}
+		}
+
+		for (var i = 0; i < json_data.articles.length; i++) {
+			var current_article_data = json_data.articles[i];
+			var new_article_element = {
+				"@": {
+					publication_type: ((current_article_data.full_text_available||current_article_data.pdf_available) ? "full_text" : "abstract_only")
+				},
+				titles: {
+					title: fix_allowed_tags(current_article_data.title)
+				},
+				contributors: (current_article_data.authors != void 0)?({
+					person_name: generate_personnames(current_article_data.authors)
+				}):null,
+				publication_date: generate_publication_date(current_article_data.date_published),
+				pages: (function(){
+					if(current_article_data.first_page == void 0 && current_article_data.first_page) return null;
+					var pgs = {};
+					if(current_article_data.first_page != void 0) pgs['first_page'] = current_article_data.first_page;
+					if(current_article_data.last_page != void 0) pgs['last_page'] = current_article_data.last_page;
+					return pgs;
+				})(),
+				publisher_item: {
+					identifier: {
+						"@": {
+							id_type: "pii"
+						},
+						"#": current_article_data.pii
+					}
+				},
+				doi_data: {
+					doi: "10.18632/oncoscience."+current_article_data.pii,
+					timestamp: timestamp,
+					resource: "http://impactjournals.com/oncoscience/index.php?abs="+current_article_data.pii
 				}
 			};
 
-
-            if(json_data.issue.number > 0) {
-                top_level['body']['journal']['journal_issue'] = {
-                    publication_date: generate_publication_date(json_data.issue.date_published),
-                    journal_volume: {
-                        volume: json_data.issue.volume
-                    },
-                    issue: json_data.issue.number,
-                    doi_data: {
-                        doi: "10.18632/oncotarget.v"+json_data.issue.volume+"i"+json_data.issue.number,
-                        resource: "http://oncotarget.com/issue/v"+json_data.issue.volume+"i"+json_data.issue.number
-                    }
-                }
-            }
-
-
-			for (var i = 0; i < json_data.articles.length; i++) {
-				var current_article_data = json_data.articles[i];
-				var new_article_element = {
-					"@": {
-						publication_type: (current_article_data.full_text_available ? "full_text" : "abstract_only")
-					},
-					titles: {
-                        title: fix_allowed_tags(current_article_data.title)
-					},
-					contributors: {
-						person_name: generate_personnames(current_article_data.authors)
-					},
-                    publication_date: generate_publication_date(current_article_data.issue_pubdate),
-					publisher_item: {
-						identifier: {
-							"@": {
-								id_type: "pii"
-							},
-							"#": current_article_data.pii
-						}
-					},
-					doi_data: {
-						doi: "10.18632/oncotarget."+current_article_data.pii,
-						timestamp: timestamp,
-						resource: "http://oncotarget.com/abstract/"+current_article_data.pii
-					}
-				};
-
-
-                if(current_article_data.first_page) {
-                    new_article_element[pages] = {
-                        first_page: current_article_data.first_page
-                        ,last_page: current_article_data.last_page
-                    };
-                }
-
-				top_level.body.journal.journal_article.push(new_article_element);
+			for(var key in new_article_element) {
+				if(new_article_element[key] == null) delete new_article_element[key];
 			}
 
-			return top_level;
+			top_level.body.journal.journal_article.push(new_article_element);
 		}
+
+		return top_level;
+	}/*,
+	generate_xml: function(volume, issue, journal_name) {
+
 
 		var journal_json = Meteor.call("get_journal_json", volume, issue);
 		var massaged_json = massage_json_to_crossref_schema(journal_json);
@@ -158,5 +233,5 @@ Meteor.methods({
 			json_string: JSON.stringify(massaged_json),
 			xml: xml_from_json
 		};
-	}
+	}*/
 })

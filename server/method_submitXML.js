@@ -1,5 +1,5 @@
 Meteor.methods({
-	submit_JSON_string_as_XML: function(json_string) {
+	submit_JSON_string_as_XML: function(json_string, test) {
 		var js2xmlparser = Meteor.npmRequire("js2xmlparser");
 
 		var xml_from_json = js2xmlparser("doi_batch", JSON.parse(json_string));
@@ -13,7 +13,7 @@ Meteor.methods({
 		};
 
 		var encoded_pingback = encodeURIComponent("doi.oncotarget.com/deposit_pingback");
-		var response = Meteor.http.call("POST", "https://api.crossref.org/deposits?pingback="+encoded_pingback, options);
+		var response = Meteor.http.call("POST", "https://api.crossref.org/deposits?"+(test?"test=true&":"")+"pingback="+encoded_pingback, options);
 
 		return {
 			code: response.statusCode,
