@@ -178,6 +178,14 @@ Meteor.methods({
 
 		for (var i = 0; i < json_data.articles.length; i++) {
 			var current_article_data = json_data.articles[i];
+            if(journal_name == 'oncotarget') {
+                var article_doi = "10.18632/oncotarget."+current_article_data.pii;
+                var article_url = "http://www.oncotarget.com/abstract/"+current_article_data.pii
+            }
+            else if(journal_name == 'oncoscience') {
+                var article_doi = "10.18632/oncoscience."+current_article_data.pii;
+                var article_url = "http://impactjournals.com/oncoscience/index.php?abs="+current_article_data.pii;
+            }
 			var new_article_element = {
 				"@": {
 					publication_type: ((current_article_data.full_text_available||current_article_data.pdf_available) ? "full_text" : "abstract_only")
@@ -205,9 +213,9 @@ Meteor.methods({
 					}
 				},
 				doi_data: {
-					doi: "10.18632/oncoscience."+current_article_data.pii,
+					doi: article_doi,
 					timestamp: timestamp,
-					resource: "http://impactjournals.com/oncoscience/index.php?abs="+current_article_data.pii
+					resource: article_url
 				}
 			};
 
