@@ -179,8 +179,9 @@ Meteor.methods({
 		for (var i = 0; i < json_data.articles.length; i++) {
 			var current_article_data = json_data.articles[i];
             if(journal_name == 'oncotarget') {
+                var sub_type_for_url = ((current_article_data.full_text_available||current_article_data.pdf_available) ? "fulltext" : "abstract");
                 var article_doi = "10.18632/oncotarget."+current_article_data.pii;
-                var article_url = "http://www.oncotarget.com/abstract/"+current_article_data.pii
+                var article_url = "http://www.oncotarget.com/"+sub_type_for_url+"/"+current_article_data.pii
             }
             else if(journal_name == 'oncoscience') {
                 var article_doi = "10.18632/oncoscience."+current_article_data.pii;
