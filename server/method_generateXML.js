@@ -190,7 +190,7 @@ Meteor.methods({
 				}):null,
 				publication_date: generate_publication_date(current_article_data.date_published),
 				pages: (function(){
-					if(current_article_data.first_page == void 0 && current_article_data.first_page) return null;
+					if(current_article_data.first_page == void 0 || current_article_data.first_page == "") return null;
 					var pgs = {};
 					if(current_article_data.first_page != void 0) pgs['first_page'] = current_article_data.first_page;
 					if(current_article_data.last_page != void 0) pgs['last_page'] = current_article_data.last_page;
