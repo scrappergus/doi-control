@@ -13,11 +13,12 @@ Meteor.methods({
 			xml: xml_from_json
 		};
 	},
-	get_json_and_generate_xml: function(journal_name, volume, issue) {
+	get_json_and_generate_xml: function(journal_name, volume, issue, date) {
+		if (!date) date = Date.now();
 		var js2xmlparser = Meteor.npmRequire("js2xmlparser");
 
-		var journal_json = Meteor.call("get_journal_json", volume, issue);
-		var crossref_json = Meteor.call("massage_json_to_crossref_schema", journal_json);
+		var journal_json = Meteor.call("get_journal_json", volume, issue, journal_name);
+		var crossref_json = Meteor.call("massage_json_to_crossref_schema", journal_name, journal_json, date);
 
 		var batch_id = DOIBatches.insert({crossref_data:crossref_json});
 		crossref_json.head.doi_batch_id = batch_id;
@@ -28,7 +29,23 @@ Meteor.methods({
 			xml: xml_from_json
 		};
 	},
-	massage_json_to_crossref_schema: function(journal_name, json_data) {
+	get_json_and_generate_xml_from_pii_list: function(journal_name, pii_list, date) {
+		var js2xmlparser = Meteor.npmRequire("js2xmlparser");
+
+		var journal_json = Meteor.call("get_journal_json_by_pii", pii_list, journal_name);
+		console.log(journal_json);
+		var crossref_json = Meteor.call("massage_json_to_crossref_schema", journal_name, journal_json, date);
+
+		var batch_id = DOIBatches.insert({crossref_data:crossref_json});
+		crossref_json.head.doi_batch_id = batch_id;
+		var xml_from_json = js2xmlparser("doi_batch", crossref_json);
+
+		return {
+			json_string: JSON.stringify(crossref_json),
+			xml: xml_from_json
+		};
+	},
+	massage_json_to_crossref_schema: function(journal_name, json_data, date) {
 		function generate_personnames(name_info_array) {
 			if(name_info_array == void 0 || name_info_array.length == 0) return null;
 			var personnames = [];
@@ -56,7 +73,6 @@ Meteor.methods({
 
 		function generate_publication_date(datestring) {
 			if(datestring == void 0) return null;
-			console.log(datestring);
 			var date = new Date(datestring);
 			var localTimeDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
 
@@ -114,6 +130,24 @@ Meteor.methods({
 					timestamp: timestamp,
 					resource: "http://impactjournals.com/oncoscience/"
 				}
+			},
+			"genesandcancer": {
+				"@": {
+					language: "en"
+				},
+				full_title: "Genes & Cancer",
+				abbrev_title: "Genes & Cancer",
+				issn: {
+					"@": {
+						media_type: "electronic"
+					},
+					"#": "1947-6027"
+				},
+				doi_data: {
+					doi: "10.18632/genesandcancer",
+					timestamp: timestamp,
+					resource: "http://www.impactjournals.com/Genes&Cancer/"
+				}
 			}
 		};
 
@@ -149,7 +183,12 @@ Meteor.methods({
 			if(json_data.issue.number > 0) {
 				if(journal_name == "oncoscience") {
 					top_level['body']['journal_issue'] = {
-						publication_date: generate_publication_date(json_data.articles[json_data.articles.length - 1].date_published),
+						publication_date: (function(){
+							var usedate = date;
+							var artpubdate = json_data.articles[json_data.articles.length - 1].date_published;
+							if(artpubdate && artpubdate != "") usedate = artpubdate;
+							return generate_publication_date(usedate);
+						})(),
 						journal_volume: {
 							volume: json_data.issue.volume_idvolume
 						},
@@ -162,7 +201,14 @@ Meteor.methods({
 				}
 				if(journal_name == "oncotarget") {
 					top_level['body']['journal']['journal_issue'] = {
-						publication_date: generate_publication_date(json_data.issue.date_published),
+						publication_date: (function(){
+							var usedate = date;
+							if(json_data.issue.date_published && json_data.issue.date_published != "") usedate = json_data.issue.date_published;
+							console.log("Ahhhh!!");
+							console.log(usedate);
+							console.log(json_data.issue.date_published);
+							return generate_publication_date(date);
+						})(),
 						journal_volume: {
 							volume: json_data.issue.volume
 						},
@@ -173,9 +219,25 @@ Meteor.methods({
 						}
 					}
 				}
+				if(journal_name == "genesandcancer") {
+					top_level['body']['journal']['journal_issue'] = {
+						publication_date: (function(){
+							var usedate = date;
+							if(json_data.issue.date_published && json_data.issue.date_published != "") usedate = json_data.issue.date_published;
+							return generate_publication_date(usedate);
+						})(),
+						journal_volume: {
+							volume: json_data.issue.volume
+						},
+						issue: json_data.issue.number,
+						doi_data: {
+							doi: "10.18632/genesandcancer.v"+json_data.issue.volume+"i"+json_data.issue.number,
+							resource: "http://impactjournals.com/Genes&Cancer/index.php?issue="+json_data.issue.idissues
+						}
+					}
+				}
 			}
 		}
-
 		for (var i = 0; i < json_data.articles.length; i++) {
 			var current_article_data = json_data.articles[i];
             if(journal_name == 'oncotarget') {
@@ -187,6 +249,10 @@ Meteor.methods({
                 var article_doi = "10.18632/oncoscience."+current_article_data.pii;
                 var article_url = "http://impactjournals.com/oncoscience/index.php?abs="+current_article_data.pii;
             }
+			else if(journal_name == 'oncoscience') {
+                var article_doi = "10.18632/genesandcancer."+current_article_data.pii;
+                var article_url = "http://www.impactjournals.com/Genes&Cancer/index.php?abs="+current_article_data.pii;
+            }
 			var new_article_element = {
 				"@": {
 					publication_type: ((current_article_data.full_text_available||current_article_data.pdf_available) ? "full_text" : "abstract_only")
@@ -197,7 +263,12 @@ Meteor.methods({
 				contributors: (current_article_data.authors != void 0)?({
 					person_name: generate_personnames(current_article_data.authors)
 				}):null,
-				publication_date: generate_publication_date(current_article_data.date_published),
+				publication_date: (function(){
+					var usedate = Date.now();
+					console.log(usedate);
+					if(current_article_data.date_published && current_article_data.date_published != "") usedate = current_article_data.date_published;
+					return generate_publication_date(usedate);
+				})(),
 				pages: (function(){
 					if(current_article_data.first_page == void 0 || current_article_data.first_page == "") return null;
 					var pgs = {};
@@ -228,19 +299,5 @@ Meteor.methods({
 		}
 
 		return top_level;
-	}/*,
-	generate_xml: function(volume, issue, journal_name) {
-
-
-		var journal_json = Meteor.call("get_journal_json", volume, issue);
-		var massaged_json = massage_json_to_crossref_schema(journal_json);
-		var batch_id = DOIBatches.insert({crossref_data:massaged_json});
-		massaged_json.head.doi_batch_id = batch_id;
-		var xml_from_json = js2xmlparser("doi_batch", massaged_json);
-
-		return {
-			json_string: JSON.stringify(massaged_json),
-			xml: xml_from_json
-		};
-	}*/
+	}
 })

@@ -24,6 +24,40 @@
     </div>
 </template>
 
+<template name="form_pii">
+    <form id="xml_generator">
+        <label for="journalname">journal name</label>
+        <select name="journalname">
+            <option value="oncotarget">Oncotarget</option>
+            <option value="oncoscience">Oncoscience</option>
+            <option value="genesandcancer">Genes &amp; Cancer</option>
+        </select>
+        <label for="piilist">pii list (comma separated, ex: 255,256,267)</label>
+        <input name="piilist" type="text">
+        <label for="date">publish date</label>
+        <input name="date" type="date">
+        <button class="waves-effect waves-light btn btn-large green">Generate XML</button>
+    </form>
+</template>
+
+<template name="form_volissue">
+    <form id="xml_generator">
+        <label for="journalname">journal name</label>
+        <select name="journalname">
+            <option value="oncotarget">Oncotarget</option>
+            <option value="oncoscience">Oncoscience</option>
+            <option value="genesandcancer">Genes &amp; Cancer</option>
+        </select>
+        <label for="volume">volume</label>
+        <input name="volume" type="text">
+        <label for="issue">issue</label>
+        <input name="issue" type="text">
+        <label for="date">publish date</label>
+        <input name="date" type="date">
+        <button class="waves-effect waves-light btn btn-large green">Generate XML</button>
+    </form>
+</template>
+
 <template name="generator_form">
   <div class="container">
     <div class="row">
@@ -35,13 +69,13 @@
       <div class="col s12">
         <div class="card">
           <div class="card-content">
-            <form id="xml_generator">
-                <label for="volume">volume</label>
-                <input name="volume" type="text">
-                <label for="issue">issue</label>
-                <input name="issue" type="text">
-                <button class="waves-effect waves-light btn btn-large green">Generate XML</button>
-            </form>
+            <button id="submission-type-switch" class="waves-effect waves-light btn btn-small blue">Switch to PII submission</button><br><br>
+            {{#if submission_type 'pii' }}
+            {{> form_pii}}
+            {{/if }}
+            {{#if submission_type 'volissue' }}
+            {{> form_volissue}}
+            {{/if }}
             <div id="submissionLink"></div>
             <button id="submitJSONasXML" style="display:none;" class="waves-effect waves-light btn btn-large blue">Submit XML</button>
           </div>
