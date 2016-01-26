@@ -33,7 +33,6 @@ Meteor.methods({
 		var js2xmlparser = Meteor.npmRequire("js2xmlparser");
 
 		var journal_json = Meteor.call("get_journal_json_by_pii", pii_list, journal_name);
-		console.log(journal_json);
 		var crossref_json = Meteor.call("massage_json_to_crossref_schema", journal_name, journal_json, date);
 
 		var batch_id = DOIBatches.insert({crossref_data:crossref_json});
@@ -88,6 +87,7 @@ Meteor.methods({
 		}
 
 		function fix_allowed_tags(str) {
+            if(typeof str !== 'string') return '';
 			re_em = /<(\/?)em\b((?:[^>"']|"[^"]*"|'[^']*')*)>/g;
 			re_strong = /<(\/?)strong\b((?:[^>"']|"[^"]*"|'[^']*')*)>/g;
 			return str.replace(re_em, "<$1i>").replace(re_strong, "<$1b>");
@@ -106,12 +106,12 @@ Meteor.methods({
 						media_type: "electronic"
 					},
 					"#": "1949-2553"
-				},
-				doi_data: {
-					doi: "10.18632/oncotarget",
-					timestamp: timestamp,
-					resource: "http://oncotarget.com"
 				}
+//				,doi_data: {
+//					doi: "10.18632/oncotarget",
+//					timestamp: timestamp,
+//					resource: "http://oncotarget.com"
+//				}
 			},
 			"oncoscience": {
 				"@": {
@@ -124,30 +124,30 @@ Meteor.methods({
 						media_type: "electronic"
 					},
 					"#": "2331-4737"
-				},
-				doi_data: {
-					doi: "10.18632/oncoscience",
-					timestamp: timestamp,
-					resource: "http://impactjournals.com/oncoscience/"
 				}
+//				,doi_data: {
+//					doi: "10.18632/oncoscience",
+//					timestamp: timestamp,
+//					resource: "http://impactjournals.com/oncoscience/"
+//				}
 			},
 			"genesandcancer": {
 				"@": {
 					language: "en"
 				},
-				full_title: "Genes & Cancer",
-				abbrev_title: "Genes & Cancer",
+                full_title: "Genes &amp; Cancer",
+				abbrev_title: "genesandcancer",
 				issn: {
 					"@": {
 						media_type: "electronic"
 					},
 					"#": "1947-6027"
-				},
-				doi_data: {
-					doi: "10.18632/genesandcancer",
-					timestamp: timestamp,
-					resource: "http://www.impactjournals.com/Genes&Cancer/"
 				}
+//				,doi_data: {
+//					doi: "10.18632/genesandcancer",
+//					timestamp: timestamp,
+//					resource: "http://www.impactjournals.com/genesandcancer/"
+//				}
 			}
 		};
 
@@ -249,9 +249,9 @@ Meteor.methods({
                 var article_doi = "10.18632/oncoscience."+current_article_data.pii;
                 var article_url = "http://impactjournals.com/oncoscience/index.php?abs="+current_article_data.pii;
             }
-			else if(journal_name == 'oncoscience') {
+			else if(journal_name == 'genesandcancer') {
                 var article_doi = "10.18632/genesandcancer."+current_article_data.pii;
-                var article_url = "http://www.impactjournals.com/Genes&Cancer/index.php?abs="+current_article_data.pii;
+                var article_url = "http://www.impactjournals.com/genesandcancer/index.php?abs="+current_article_data.pii;
             }
 			var new_article_element = {
 				"@": {
@@ -265,7 +265,9 @@ Meteor.methods({
 				}):null,
 				publication_date: (function(){
 					var usedate = Date.now();
-					console.log(usedate);
+					if(current_article_data.date_published === null) {
+                        usedate = date;
+                    }
 					if(current_article_data.date_published && current_article_data.date_published != "") usedate = current_article_data.date_published;
 					return generate_publication_date(usedate);
 				})(),
