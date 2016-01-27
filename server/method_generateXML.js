@@ -167,7 +167,7 @@ Meteor.methods({
 				timestamp: timestamp,
 				depositor: {
 					depositor_name: "Impact Journals",
-					email_address: "gus@oncotarget.com"
+					email_address: Meteor.settings.reports_email
 				},
 				registrant: "Impact Journals"
 			},
@@ -179,15 +179,21 @@ Meteor.methods({
 			}
 		};
 
-		if(json_data.issue != void 0) {
-			if(json_data.issue.number > 0) {
+		if(json_data.issue !== undefined && json_data.issue != void 0 && json_data.issue.number > 0) {
 				if(journal_name == "oncoscience") {
 					top_level['body']['journal_issue'] = {
 						publication_date: (function(){
 							var usedate = date;
-							var artpubdate = json_data.articles[json_data.articles.length - 1].date_published;
-							if(artpubdate && artpubdate != "") usedate = artpubdate;
+
+							if(json_data.issue.date_published && json_data.issue.date_published != "") {
+                                usedate = json_data.issue.date_published;
+                            }
 							return generate_publication_date(usedate);
+
+
+//							var artpubdate = json_data.articles[json_data.articles.length - 1].date_published;
+//							if(artpubdate && artpubdate != "") usedate = artpubdate;
+//							return generate_publication_date(usedate);
 						})(),
 						journal_volume: {
 							volume: json_data.issue.volume_idvolume
@@ -204,9 +210,6 @@ Meteor.methods({
 						publication_date: (function(){
 							var usedate = date;
 							if(json_data.issue.date_published && json_data.issue.date_published != "") usedate = json_data.issue.date_published;
-							console.log("Ahhhh!!");
-							console.log(usedate);
-							console.log(json_data.issue.date_published);
 							return generate_publication_date(date);
 						})(),
 						journal_volume: {
@@ -236,7 +239,6 @@ Meteor.methods({
 						}
 					}
 				}
-			}
 		}
 		for (var i = 0; i < json_data.articles.length; i++) {
 			var current_article_data = json_data.articles[i];
@@ -265,7 +267,7 @@ Meteor.methods({
 				}):null,
 				publication_date: (function(){
 					var usedate = Date.now();
-					if(current_article_data.date_published === null) {
+					if(current_article_data.date_published === null || current_article_data.date_published == '') {
                         usedate = date;
                     }
 					if(current_article_data.date_published && current_article_data.date_published != "") usedate = current_article_data.date_published;
