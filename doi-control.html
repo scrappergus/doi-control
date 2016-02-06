@@ -28,38 +28,12 @@
 </template>
 
 <template name="form_pii">
-    <div class="form-container">
-        <form class="xml_generator">
-            <select name="journalname">
-                <option value="" disabled selected>select journal</option>
-                <option value="oncotarget">Oncotarget</option>
-                <option value="oncoscience">Oncoscience</option>
-                <option value="genesandcancer">Genes &amp; Cancer</option>
-            </select>
-            <input name="piilist" type="text" placeholder="pii list  (ex: 255,256,267)">
-            <label for="date">publish date</label>
-            <input name="date" type="date">
-            <button class="waves-effect waves-light btn">Generate XML</button>
-        </form>
-    </div>
+  <input name="piilist" type="text" placeholder="pii list  (ex: 255,256,267)">
 </template>
 
 <template name="form_volissue">
-    <div class="form-container">
-        <form id="xml_generator">
-            <select name="journalname">
-                <option value="" disabled selected>select journal</option>
-                <option value="oncotarget">Oncotarget</option>
-                <option value="oncoscience">Oncoscience</option>
-                <option value="genesandcancer">Genes &amp; Cancer</option>
-            </select>
-            <input name="volume" type="text" placeholder="volume">
-            <input name="issue" type="text" placeholder="issue">
-            <label for="date">publish date</label>
-            <input name="date" type="date">
-            <button class="waves-effect waves-light btn">Generate XML</button>
-        </form>
-    </div>
+  <input name="volume" type="text" placeholder="volume">
+  <input name="issue" type="text" placeholder="issue">
 </template>
 
 <template name="generator_form">
@@ -70,12 +44,25 @@
         <div class="card">
           <div class="card-content">
             <button id="submission-type-switch" class="waves-effect waves-light btn blue">Switch to PII submission</button>
-            {{#if submission_type 'pii' }}
-            {{> form_pii}}
-            {{/if }}
-            {{#if submission_type 'volissue' }}
-            {{> form_volissue}}
-            {{/if }}
+            <div class="form-container">
+                <form class="xml_generator">
+                    <select name="journalname">
+                        <option value="" disabled selected>select journal</option>
+                        <option value="oncotarget">Oncotarget</option>
+                        <option value="oncoscience">Oncoscience</option>
+                        <option value="genesandcancer">Genes &amp; Cancer</option>
+                    </select>
+                    {{#if submission_type 'pii' }}
+                    {{> form_pii}}
+                    {{/if }}
+                    {{#if submission_type 'volissue' }}
+                    {{> form_volissue}}
+                    {{/if }}
+                    <label for="date">publish date</label>
+                    <input name="date" type="date">
+                    <button class="waves-effect waves-light btn">Generate XML</button>
+                </form>
+            </div>
           </div>
         </div>
       </div>
