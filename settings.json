@@ -1,5 +1,11 @@
 {
-  "public": {
-
-  }
+  "galaxy.meteor.com":{
+        "env": {
+            "ROOT_URL": "http://doi.oncotarget.com",
+            "MONGO_URL": "mongodb://paperchase:T1nat1na@ds035905-a0.mongolab.com:35905/doi"
+      }
+  },
+  "cr_cred_un": "imjo",
+  "cr_cred_pw": "imjo_827",
+  "reports_email": "impactauto@tina.company"
 }

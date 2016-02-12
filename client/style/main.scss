@@ -1,9 +1,34 @@
 $white-off: #f2f2f2;
 
-body{
+body {
 	background: $white-off;
 }
 
-h1{
-	text-align: center;
+select {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.hidden {
+    display: none;
+}
+
+.editor-container {
+    min-width: 800px;    
+    width: auto;
+    float: left;
+    margin: 15px;
+}
+
+.form-container {
+    max-width: 330px;
+    float: left;
+    margin: 15px;
+}
+
+
+.container {
+    padding: 15px;
+    width:100%;
 }
