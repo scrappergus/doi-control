@@ -1,76 +1,34 @@
 $white-off: #f2f2f2;
 
-body{
+body {
 	background: $white-off;
 }
 
-h1{
-	text-align: center;
-    font-size: 1.5em;
+select {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: block;
 }
 
-#msg-error {
-    padding: 10px;
+.hidden {
+    display: none;
 }
 
-
-.generator-container {
-    float: left;
-    min-width: 400px;
-    text-align: center;
-    margin: 0 auto;
-}
-
-.xml-container {
+.editor-container {
+    min-width: 800px;    
     width: auto;
-    overflow: hidden;
-    min-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-
-    // code and pre code tag styles inspired by
-    // https://perishablepress.com/perfect-pre-tags/
-    code {
-    	font-family: "Courier New", Courier, monospace, sans-serif;
-    	text-align: left;
-    	color: #555;
-	}
-    pre code {
-    	line-height: 1.6em;
-    	font-size: 11px;
-    }
-    pre {
-        margin-top: 24px;
-        margin-bottom: 24px;
-        border: 1px solid #ddddde;
-        border-left: 9px solid #ddddde;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    	overflow: auto;
-    }
+    float: left;
+    margin: 15px;
 }
 
 .form-container {
-    width: 325px;
-    margin: 24px auto;
-    text-align: center;
+    max-width: 330px;
+    float: left;
+    margin: 15px;
+}
 
-    form {
-        box-sizing: border-box;
-        padding: 24px;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    }
 
-    button {
-        margin: 12px auto 0;
-    }
-
-    input, select{
-        display: block;
-        box-sizing: border-box;
-        width: 275px;
-        box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.075);
-        padding: 12px 18px;
-        border: 1px solid #cccccd;
-        margin-bottom: 24px;
-    }
+.container {
+    padding: 15px;
+    width:100%;
 }

@@ -1,3 +1,4 @@
+arch:ace-editor@1.2.1
 autopublish@1.0.4
 autoupdate@1.2.4
 babel-compiler@5.8.24_1
@@ -67,7 +68,6 @@ reload@1.1.4
 retry@1.0.4
 routepolicy@1.0.6
 session@1.1.1
-simple:highlight.js@1.2.0
 spacebars@1.0.7
 spacebars-compiler@1.0.7
 standard-minifiers@1.0.2

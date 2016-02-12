@@ -1,88 +1,66 @@
 <head>
   <title>DOI Control</title>
 </head>
-
 <body>
 </body>
 
 <template name="home">
-    <div class="row">
-      <div class="col s12 hide center-align" id="msg-error">
-        <div class="badge red lighten-2"></div>
-      </div>
-    </div>
-    {{> generator_form}}
+  <div class="container">
+    {{> form}}
+    {{> xml}}
+  </div>
 </template>
 
-<template name="awareness">
-    <div class="container">
-        {{#each pings}}
-            <div class="row">
-                <div class="col s12">
-                    {{request}}
-                </div>
-                <hr>
-            </div>
-        {{/each}}
-    </div>
-</template>
-
-<template name="form_pii">
-  <input name="piilist" type="text" placeholder="pii list  (ex: 255,256,267)">
-</template>
-
-<template name="form_volissue">
-  <input name="volume" type="text" placeholder="volume">
-  <input name="issue" type="text" placeholder="issue">
-</template>
-
-<template name="generator_form">
-  <H1>DOI Control</H1>
-  <div class="generator-container">
+<template name="xml">
+  <div class="editor-container">
     <div class="row">
       <div class="col s12">
         <div class="card">
           <div class="card-content">
-            <button id="submission-type-switch" class="waves-effect waves-light btn blue">Switch to PII submission</button>
-            <div class="form-container">
-                <form class="xml_generator">
-                    <select name="journalname">
-                        <option value="" disabled selected>select journal</option>
-                        <option value="oncotarget">Oncotarget</option>
-                        <option value="oncoscience">Oncoscience</option>
-                        <option value="genesandcancer">Genes &amp; Cancer</option>
-                    </select>
-                    {{#if submission_type 'pii' }}
-                    {{> form_pii}}
-                    {{/if }}
-                    {{#if submission_type 'volissue' }}
-                    {{> form_volissue}}
-                    {{/if }}
-                    <label for="date">publish date</label>
-                    <input name="date" type="date">
-                    <button class="waves-effect waves-light btn">Generate XML</button>
-                </form>
-            </div>
+            <button class="submit-xml btn">Submit XML</button>
+            <pre id="xmlbox"></pre>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="xml-container">
-    <div class="row hide" id="resp-xml">
+</template>
+
+<template name="form">
+  <div class="form-container">
+    <div class="row">
       <div class="col s12">
         <div class="card">
           <div class="card-content">
-            <div class="code-container">
-              <div id="submissionLink"></div>
-              <button style="display:none;" class="submitJSONasXML waves-effect waves-light btn blue">Submit XML</button>
-              <pre><code class="html" id="xmlbox"></code></pre>
-              <div id="submissionLink"></div>
-              <button style="display:none;" class="submitJSONasXML waves-effect waves-light btn blue">Submit XML</button>
-            </div>
+            <button class="switch btn">Switch to PII submission</button>
+            <form class="generate-xml-form">
+              <select name="journal">
+                <option value="" disabled selected>select journal</option>
+                <option value="oncotarget">Oncotarget</option>
+                <option value="oncoscience">Oncoscience</option>
+                <option value="genesandcancer">Genes &amp; Cancer</option>
+              </select>
+              {{#if isVolume }}
+                {{> volume}}
+              {{else}}
+                {{> pii}}
+              {{/if}}
+              <label for="date">publishing date</label>
+              <input name="date" type="date" value="{{date}}">
+              <button class="btn">Generate submission</button>
+            </form>
           </div>
         </div>
       </div>
     </div>
   </div>
+</template>
+
+<template name="volume">
+  <input placeholder="issue" type="text" name="issue">
+  <input placeholder="volume" type="text" name="volume">
+</template>
+
+<template name="pii">
+  <input placeholder="pii list  (ex: 255,256,267)" type="text" name="piilist">
 </template>
