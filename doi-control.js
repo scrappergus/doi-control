@@ -19,9 +19,10 @@ if (Meteor.isClient) {
       }
       e.target.innerText = 'Submitting...'
       Meteor.call('submit_xml', xml, function(err, data) {
-        if (err) {
+        var error = err && err.error || data.error;
+        if (error) {
           e.target.innerText = 'Submit XML'
-          return alert(err)
+          return alert(error)
         }
         e.target.innerText = 'Submitted'
         clearEditor()
@@ -41,19 +42,22 @@ if (Meteor.isClient) {
         'Switch to volume submission'
     },
     'submit .generate-xml-form': function(e) {
+      var button = e.target.querySelector('button')
       var journal = e.target.journal.value,
         volume = e.target.volume && e.target.volume.value,
         issue = e.target.issue && e.target.issue.value,
         piilist = e.target.piilist && e.target.piilist.value,
         date = e.target.date.value
       e.preventDefault()
+      button.innerText = 'Generating...'
       piilist ?
         Meteor.call('get_json_and_generate_xml_from_pii_list', journal, piilist, date, cb) :
         Meteor.call('get_json_and_generate_xml', journal, volume, issue, date, cb)
 
       function cb(err, data) {
+        button.innerText = 'Generate submission'
         if (err) {
-          return alert(err)
+          return alert(err.error)
         }
         loadEditor(data.xml)
         e.target.reset()
