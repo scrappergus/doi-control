@@ -14,14 +14,14 @@ Meteor.methods({
 		};
 	},
 	get_json_and_generate_xml: function(journal_name, volume, issue, date) {
-		if (!date) date = Date.now();
-		var js2xmlparser = Meteor.npmRequire("js2xmlparser");
-
 		var journal_json = Meteor.call("get_journal_json", volume, issue, journal_name);
+		date = date || journal_json.issue.date_published || Date.now();
 		var crossref_json = Meteor.call("massage_json_to_crossref_schema", journal_name, journal_json, date);
 
 		var batch_id = DOIBatches.insert({crossref_data:crossref_json});
 		crossref_json.head.doi_batch_id = batch_id;
+
+		var js2xmlparser = Meteor.npmRequire("js2xmlparser");
 		var xml_from_json = js2xmlparser("doi_batch", crossref_json);
 
 		return {
@@ -30,13 +30,14 @@ Meteor.methods({
 		};
 	},
 	get_json_and_generate_xml_from_pii_list: function(journal_name, pii_list, date) {
-		var js2xmlparser = Meteor.npmRequire("js2xmlparser");
-
 		var journal_json = Meteor.call("get_journal_json_by_pii", pii_list, journal_name);
+		date = date || journal_json.issue.date_published || Date.now();
 		var crossref_json = Meteor.call("massage_json_to_crossref_schema", journal_name, journal_json, date);
 
 		var batch_id = DOIBatches.insert({crossref_data:crossref_json});
 		crossref_json.head.doi_batch_id = batch_id;
+
+		var js2xmlparser = Meteor.npmRequire("js2xmlparser");
 		var xml_from_json = js2xmlparser("doi_batch", crossref_json);
 
 		return {
@@ -266,7 +267,7 @@ Meteor.methods({
 					person_name: generate_personnames(current_article_data.authors)
 				}):null,
 				publication_date: (function(){
-					var usedate = Date.now();
+					var usedate = date;
 					if(current_article_data.date_published === null || current_article_data.date_published == '') {
                         usedate = date;
                     }
