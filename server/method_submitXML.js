@@ -1,4 +1,10 @@
 Meteor.methods({
+  submit_JSON_string_as_XML: function(jsonString, test) {
+    var js2xmlparser = Meteor.npmRequire('js2xmlparser');
+    var xml = js2xmlparser('doi_batch', JSON.parse(jsonString));
+    return Meteor.call('submit_xml', xml, test);
+  },
+
   submit_xml: function(xml, test) {
     var baseUrl = 'https://api.crossref.org';
     var options = {
