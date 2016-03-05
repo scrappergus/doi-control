@@ -14,7 +14,17 @@ Meteor.methods({
 		};
 	},
 	get_json_and_generate_xml: function(journal_name, volume, issue, date) {
-		var journal_json = Meteor.call("get_journal_json", volume, issue, journal_name);
+		var journal_json;
+
+		if (journal_name === 'aging') {
+			journal_json = Meteor.call("get_journal_json_from_db", {
+				volume: volume,
+				issue: issue
+			});
+		} else {
+			journal_json = Meteor.call("get_journal_json", volume, issue, journal_name);
+		}
+
 		date = date || journal_json.issue.date_published || Date.now();
 		var crossref_json = Meteor.call("massage_json_to_crossref_schema", journal_name, journal_json, date);
 
@@ -30,8 +40,15 @@ Meteor.methods({
 		};
 	},
 	get_json_and_generate_xml_from_pii_list: function(journal_name, pii_list, date) {
-		var journal_json = Meteor.call("get_journal_json_by_pii", pii_list, journal_name);
-		date = date || journal_json.issue.date_published || Date.now();
+		var journal_json;
+		if (journal_name === 'aging') {
+			journal_json = Meteor.call("get_journal_json_from_db", {
+				piis: pii_list
+			});
+		} else {
+			journal_json = Meteor.call("get_journal_", pii_list, journal_name);
+		}
+		date = date || Date.now();
 		var crossref_json = Meteor.call("massage_json_to_crossref_schema", journal_name, journal_json, date);
 
 		var batch_id = DOIBatches.insert({crossref_data:crossref_json});
@@ -144,11 +161,24 @@ Meteor.methods({
 					},
 					"#": "1947-6027"
 				}
+			},
 //				,doi_data: {
 //					doi: "10.18632/genesandcancer",
 //					timestamp: timestamp,
 //					resource: "http://www.impactjournals.com/genesandcancer/"
 //				}
+			"aging": {
+				"@": {
+					language: "en"
+				},
+                full_title: "Aging",
+				abbrev_title: "aging",
+				issn: {
+					"@": {
+						media_type: "electronic"
+					},
+					"#": "1945-4589"
+				}
 			}
 		};
 
@@ -181,6 +211,24 @@ Meteor.methods({
 		};
 
 		if(json_data.issue !== undefined && json_data.issue != void 0 && json_data.issue.number > 0) {
+				if(journal_name == "aging") {
+					top_level['body']['journal_issue'] = {
+						publication_date: (function(){
+							var usedate = date;
+							if(json_data.issue.date_published && json_data.issue.date_published != "") usedate = json_data.issue.date_published;
+							return generate_publication_date(usedate);
+						})(),
+						journal_volume: {
+							volume: json_data.issue.volume
+						},
+						issue: json_data.issue.number,
+						doi_data: {
+							doi: "10.18632/aging.v"+json_data.issue.volume+"i"+json_data.issue.number,
+							resource: "http://impactaging.com/contents?volumeId=" + json_data.issue.volume + "&issueId=" + json_data.issue.number
+						}
+					}
+				}
+
 				if(journal_name == "oncoscience") {
 					top_level['body']['journal_issue'] = {
 						publication_date: (function(){
@@ -241,9 +289,14 @@ Meteor.methods({
 					}
 				}
 		}
+
 		for (var i = 0; i < json_data.articles.length; i++) {
 			var current_article_data = json_data.articles[i];
-            if(journal_name == 'oncotarget') {
+			if(journal_name == 'aging') {
+                var article_doi = "10.18632/aging."+current_article_data.pii;
+                var article_url = "http://impactaging.com/papers/v" + json_data.issue.volume + "/n" + json_data.issue.number + "/full/" + current_article_data.pii + ".html";
+            }
+            else if(journal_name == 'oncotarget') {
                 var sub_type_for_url = ((current_article_data.full_text_available||current_article_data.pdf_available) ? "fulltext" : "abstract");
                 var article_doi = "10.18632/oncotarget."+current_article_data.pii;
                 var article_url = "http://www.oncotarget.com/"+sub_type_for_url+"/"+current_article_data.pii
