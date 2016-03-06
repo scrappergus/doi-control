@@ -5,9 +5,6 @@ if (Meteor.isClient) {
   Template.form.helpers({
     isVolume: function() {
       return Session.get('isVolume')
-    },
-    date: function() {
-      return moment(Date.now()).format('YYYY-MM-DD');
     }
   })
 
