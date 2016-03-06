@@ -40,7 +40,6 @@ Meteor.methods({
 		};
 	},
 	get_json_and_generate_xml_from_pii_list: function(journal_name, pii_list, date) {
-		console.log('>>>', arguments)
 		var journal_json;
 		if (journal_name === 'aging') {
 			journal_json = Meteor.call("get_journal_json_from_db", {
@@ -154,7 +153,7 @@ Meteor.methods({
 				"@": {
 					language: "en"
 				},
-                full_title: "Genes &amp; Cancer",
+                full_title: "Genes & Cancer",
 				abbrev_title: "genesandcancer",
 				issn: {
 					"@": {
