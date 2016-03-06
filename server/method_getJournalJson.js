@@ -4,7 +4,7 @@ Meteor.methods({
 		if (options.volume) query.volume = Number(options.volume);
 		if (options.issue) query.issue = options.issue;
 		if (options.piis) query['ids.pii'] = {'$in': options.piis.split(',')}
-		Articles.find(query).fetch().map(function(article) {
+		var articles = Articles.find(query).fetch().map(function(article) {
 			date_published = article.dates.epub;
 			return {
 				title: article.title,
@@ -13,9 +13,11 @@ Meteor.methods({
 				first_page: article.page_start,
 				last_page: article.page_end,
 				authors: article.authors? article.authors.map(function(author) {
+					var first = author.name_first && author.name_first.length > 0? author.name_first: undefined;
+					var last = author.name_last && author.name_last.length > 0? author.name_last: undefined;
 					return {
-						first_name: author.name_first,
-						last_name: author.name_last
+						first_name: first,
+						last_name: last
 					}
 				}): undefined
 			}
