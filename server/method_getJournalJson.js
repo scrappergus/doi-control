@@ -22,6 +22,10 @@ Meteor.methods({
 				}): undefined
 			}
 		});
+	
+		if (articles.length === 0) {
+			throw new Meteor.Error(404, 'not found');
+		}
 
 		return {
 			articles: articles,
