@@ -204,15 +204,14 @@ Meteor.methods({
 			},
 			body: {
 				journal: {
-					journal_metadata: metadata[journal_name],
-					journal_article: []
+					journal_metadata: metadata[journal_name]
 				}
 			}
 		};
 
 		if(json_data.issue !== undefined && json_data.issue != void 0 && json_data.issue.number > 0) {
 				if(journal_name == "aging") {
-					top_level['body']['journal_issue'] = {
+					top_level['body']['journal']['journal_issue'] = {
 						publication_date: (function(){
 							var usedate = date;
 							if(json_data.issue.date_published && json_data.issue.date_published != "") usedate = json_data.issue.date_published;
@@ -230,7 +229,7 @@ Meteor.methods({
 				}
 
 				if(journal_name == "oncoscience") {
-					top_level['body']['journal_issue'] = {
+					top_level['body']['journal']['journal_issue'] = {
 						publication_date: (function(){
 							var usedate = date;
 
@@ -290,6 +289,7 @@ Meteor.methods({
 				}
 		}
 
+		top_level['body']['journal']['journal_article'] = [];
 		for (var i = 0; i < json_data.articles.length; i++) {
 			var current_article_data = json_data.articles[i];
 			if(journal_name == 'aging') {
