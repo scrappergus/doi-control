@@ -40,13 +40,14 @@ Meteor.methods({
 		};
 	},
 	get_json_and_generate_xml_from_pii_list: function(journal_name, pii_list, date) {
+		console.log('>>>', arguments)
 		var journal_json;
 		if (journal_name === 'aging') {
 			journal_json = Meteor.call("get_journal_json_from_db", {
 				piis: pii_list
 			});
 		} else {
-			journal_json = Meteor.call("get_journal_", pii_list, journal_name);
+			journal_json = Meteor.call("get_journal_json_by_pii", pii_list, journal_name);
 		}
 		date = date || Date.now();
 		var crossref_json = Meteor.call("massage_json_to_crossref_schema", journal_name, journal_json, date);
