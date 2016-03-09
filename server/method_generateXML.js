@@ -42,9 +42,7 @@ Meteor.methods({
 	get_json_and_generate_xml_from_pii_list: function(journal_name, pii_list, date) {
 		var journal_json;
 		if (journal_name === 'aging') {
-			journal_json = Meteor.call("get_journal_json_from_db", {
-				piis: pii_list
-			});
+			journal_json = Meteor.call("get_journal_json_from_db_by_pii", pii_list);
 		} else {
 			journal_json = Meteor.call("get_journal_json_by_pii", pii_list, journal_name);
 		}
