@@ -12,20 +12,17 @@ if (Meteor.isClient) {
     'click .submit-xml': function(e) {
       var xml = Session.get('xml');
       if (!Meteor.utils.isValidXml(xml)) {
-        return alert('invalid xml')
+        return feedback('invalid xml');
       }
       e.target.innerText = 'Submitting...'
       Meteor.call('submit_xml', xml, function(err, data) {
+        e.target.innerText = 'Submit XML'
         var error = err && err.error || data.error;
-        if (error) {
-          e.target.innerText = 'Submit XML'
-          return alert(error)
+        if (err) {
+          return feedback(err.error);
         }
-        e.target.innerText = 'Submitted'
-        clearEditor()
-        setTimeout(function() {
-          e.target.innerText = 'Submit XML'
-        }, 750)
+        feedback('XML Submitted', true);
+        clearEditor();
       });
     }
   })
@@ -54,7 +51,7 @@ if (Meteor.isClient) {
       function cb(err, data) {
         button.innerText = 'Generate submission'
         if (err) {
-          return alert(err.error)
+          feedback(err.error);
         }
         loadEditor(data.xml)
         e.target.reset()
@@ -78,6 +75,16 @@ if (Meteor.isClient) {
       })
     })
   })
+
+  function feedback(message, success) {
+    var $feedback = document.getElementById('feedback');
+    $feedback.setAttribute('class', success? 'teal lighten-3 white-text' : 'red lighten-3');
+    $feedback.innerText = message;
+    setTimeout(function() {
+      $feedback.setAttribute('class', '');
+      $feedback.innerText = '';
+    }, 3000);
+  }
 
   function clearEditor() {
     AceEditor.instance('xmlbox', null, function(editor) {
