@@ -12,7 +12,7 @@ if (Meteor.isClient) {
     'click .submit-xml': function(e) {
       var xml = Session.get('xml');
       if (!Meteor.utils.isValidXml(xml)) {
-        return feedback('invalid xml');
+        return feedback('Invalid XML');
       }
       e.target.innerText = 'Submitting...'
       Meteor.call('submit_xml', xml, function(err, data) {
