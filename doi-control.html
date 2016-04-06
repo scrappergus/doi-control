@@ -8,7 +8,6 @@
   <div class="container">
     {{> form}}
     {{> xml}}
-    {{> info}}
   </div>
 </template>
 
@@ -28,24 +27,6 @@
   </div>
 </template>
 
-<template name="info">
-  <div class="info-container">
-    <div class="row">
-      <div class="col s12">
-        <div class="card">
-          <div class="card-content">
-            <ul>
-            {{#each registeredPiis}}
-              <li>{{this}} is already registered.</li>
-            {{/each}}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <template name="form">
   <div class="form-container">
     <div class="row">
@@ -54,7 +35,7 @@
           <div class="card-content">
             <button class="switch btn">Switch to PII submission</button>
             <form class="generate-xml-form">
-              <select name="journal">
+              <select class="journal" name="journal">
                 <option value="" disabled selected>select journal</option>
                 <option value="oncotarget">Oncotarget</option>
                 <option value="oncoscience">Oncoscience</option>
@@ -65,6 +46,11 @@
                 {{> volume}}
               {{else}}
                 {{> pii}}
+                <ul>
+                {{#each registeredPiis}}
+                  <li><i class="mdi mdi-check"></i>{{this}}</li>
+                {{/each}}
+                </ul>
               {{/if}}
               <label for="date">publishing date</label>
               <input name="date" type="date">

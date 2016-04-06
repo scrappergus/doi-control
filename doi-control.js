@@ -1,5 +1,5 @@
 if (Meteor.isClient) {
-  Session.set('loadedPiis', {})
+  Session.set('registeredPiis', [])
   Session.set('blockRequests', false)
 
   Session.set('isVolume', true)
@@ -11,12 +11,9 @@ if (Meteor.isClient) {
     }
   })
 
-  Template.xml.helpers({
+  Template.form.helpers({
     registeredPiis: function() {
-      var piis = Session.get('loadedPiis')
-      return Object.keys(piis).filter(function(pii) {
-        return piis[pii];
-      })
+      return Session.get('registeredPiis')
     }
   })
 
@@ -40,41 +37,34 @@ if (Meteor.isClient) {
   })
 
   Template.form.events({
+    'change .journal': function(e) {
+      Session.set('journal', e.target.value)
+    },
     'input .piilist': function(e) {
-      var loadedPiis = Session.get('loadedPiis')
+      var registeredPiis = Session.get('registeredPiis')
       var blockRequests = Session.get('blockRequests')
-      console.log('input', e.target.value, loadedPiis, blockRequests);
-      e.target.value
+      var inputs = e.target.value
         .split(',')
+        .map(function(pii) {
+          return pii.trim()
+        })
+
+      updateRegistered(inputs, registeredPiis)
+
+      inputs
         .filter(function(pii) {
           // check that pii has not been loaded
-          console.log('filter 1')
-          return loadedPiis[pii] === undefined
+          return registeredPiis.indexOf(pii) === -1
         })
         .filter(function(pii) {
           // check if should delay request
-          console.log('filter 2')
           return !blockRequests
         })
         .forEach(function(pii) {
-          console.log(pii);
-          Meteor.call('checkRegistration', pii, function(err, body) {
-            console.log(arguments);
-            if (err || !body) {
-              return;
-            }
-            var isRegistered = body.toString().indexOf('Resource not found') === -1
-            loadedPiis[pii] = isRegistered
-
-            // block requests for a second
-            Session.set('loadedPiis', loadedPiis)
-            if (!blockRequests) {
-              console.log('block');
-              Session.set('blockRequests', true)
-              setTimeout(function() {
-                console.log('unblock');
-                Session.set('blockRequests', false)
-              }, 1000)
+          Meteor.call('checkRegistration', Session.get('journal'), pii, function(err, body) {
+            if (!err && body) {
+              registeredPiis.push(pii)
+              updateRegistered(inputs, registeredPiis)
             }
           })
         })
@@ -127,6 +117,12 @@ if (Meteor.isClient) {
       })
     })
   })
+
+  function updateRegistered(inputs, registeredPiis) {
+    Session.set('registeredPiis', registeredPiis.filter(function(registered) {
+      return inputs.indexOf(registered) !== -1
+    }))
+  }
 
   function feedback(message, success) {
     var $feedback = document.getElementById('feedback')
