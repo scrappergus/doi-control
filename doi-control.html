@@ -8,6 +8,7 @@
   <div class="container">
     {{> form}}
     {{> xml}}
+    {{> info}}
   </div>
 </template>
 
@@ -20,6 +21,24 @@
             <button class="submit-xml btn">Submit XML</button>
             <pre id="xmlbox"></pre>
             <p id="feedback"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="info">
+  <div class="info-container">
+    <div class="row">
+      <div class="col s12">
+        <div class="card">
+          <div class="card-content">
+            <ul>
+            {{#each registeredPiis}}
+              <li>{{this}} is already registered.</li>
+            {{/each}}
+            </ul>
           </div>
         </div>
       </div>
@@ -64,5 +83,5 @@
 </template>
 
 <template name="pii">
-  <input placeholder="pii list  (ex: 255,256,267)" type="text" name="piilist">
+  <input class="piilist" placeholder="pii list  (ex: 255,256,267)" type="text" name="piilist">
 </template>

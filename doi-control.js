@@ -1,4 +1,7 @@
 if (Meteor.isClient) {
+  Session.set('loadedPiis', {})
+  Session.set('blockRequests', false)
+
   Session.set('isVolume', true)
   Session.set('xml', '')
 
@@ -8,26 +11,75 @@ if (Meteor.isClient) {
     }
   })
 
+  Template.xml.helpers({
+    registeredPiis: function() {
+      var piis = Session.get('loadedPiis')
+      return Object.keys(piis).filter(function(pii) {
+        return piis[pii];
+      })
+    }
+  })
+
   Template.xml.events({
     'click .submit-xml': function(e) {
-      var xml = Session.get('xml');
+      var xml = Session.get('xml')
       if (!Meteor.utils.isValidXml(xml)) {
-        return feedback('Invalid XML');
+        return feedback('Invalid XML')
       }
       e.target.innerText = 'Submitting...'
       Meteor.call('submit_xml', xml, function(err, data) {
         e.target.innerText = 'Submit XML'
-        var error = err && err.error || data.error;
+        var error = err && err.error || data.error
         if (err) {
-          return feedback(err.error);
+          return feedback(err.error)
         }
-        feedback('XML Submitted', true);
-        clearEditor();
-      });
+        feedback('XML Submitted', true)
+        clearEditor()
+      })
     }
   })
 
   Template.form.events({
+    'input .piilist': function(e) {
+      var loadedPiis = Session.get('loadedPiis')
+      var blockRequests = Session.get('blockRequests')
+      console.log('input', e.target.value, loadedPiis, blockRequests);
+      e.target.value
+        .split(',')
+        .filter(function(pii) {
+          // check that pii has not been loaded
+          console.log('filter 1')
+          return loadedPiis[pii] === undefined
+        })
+        .filter(function(pii) {
+          // check if should delay request
+          console.log('filter 2')
+          return !blockRequests
+        })
+        .forEach(function(pii) {
+          console.log(pii);
+          Meteor.call('checkRegistration', pii, function(err, body) {
+            console.log(arguments);
+            if (err || !body) {
+              return;
+            }
+            var isRegistered = body.toString().indexOf('Resource not found') === -1
+            loadedPiis[pii] = isRegistered
+
+            // block requests for a second
+            Session.set('loadedPiis', loadedPiis)
+            if (!blockRequests) {
+              console.log('block');
+              Session.set('blockRequests', true)
+              setTimeout(function() {
+                console.log('unblock');
+                Session.set('blockRequests', false)
+              }, 1000)
+            }
+          })
+        })
+
+    },
     'click .switch': function(e) {
       var isVolumeInverted = Session.get('isVolume') ? false : true
       Session.set('isVolume', isVolumeInverted)
@@ -51,7 +103,7 @@ if (Meteor.isClient) {
       function cb(err, data) {
         button.innerText = 'Generate submission'
         if (err) {
-          feedback(err.error);
+          feedback(err.error)
         }
         loadEditor(data.xml)
         e.target.reset()
@@ -77,13 +129,13 @@ if (Meteor.isClient) {
   })
 
   function feedback(message, success) {
-    var $feedback = document.getElementById('feedback');
-    $feedback.setAttribute('class', success? 'teal lighten-3 white-text' : 'red lighten-3');
-    $feedback.innerText = message;
+    var $feedback = document.getElementById('feedback')
+    $feedback.setAttribute('class', success? 'teal lighten-3 white-text' : 'red lighten-3')
+    $feedback.innerText = message
     setTimeout(function() {
-      $feedback.setAttribute('class', '');
-      $feedback.innerText = '';
-    }, 3000);
+      $feedback.setAttribute('class', '')
+      $feedback.innerText = ''
+    }, 3000)
   }
 
   function clearEditor() {
