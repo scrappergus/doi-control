@@ -48,7 +48,14 @@
                 {{> pii}}
                 <ul>
                 {{#each registeredPiis}}
-                  <li><i class="mdi mdi-check"></i>{{this}}</li>
+                  <li>
+                  {{#if this.status}}
+                    <i class="mdi mdi-check green-text"></i>
+                  {{else}}
+                    <i class="mdi mdi-close red-text"></i>
+                  {{/if}}
+                    {{this.pii}}
+                  </li>
                 {{/each}}
                 </ul>
               {{/if}}

@@ -54,18 +54,17 @@ if (Meteor.isClient) {
       inputs
         .filter(function(pii) {
           // check that pii has not been loaded
-          return registeredPiis.indexOf(pii) === -1
-        })
-        .filter(function(pii) {
-          // check if should delay request
-          return !blockRequests
+          return registeredPiis.map(function(item) {
+            return item.pii
+          }).indexOf(pii) === -1
         })
         .forEach(function(pii) {
           Meteor.call('checkRegistration', Session.get('journal'), pii, function(err, body) {
-            if (!err && body) {
-              registeredPiis.push(pii)
-              updateRegistered(inputs, registeredPiis)
-            }
+            registeredPiis.push({
+              pii: pii,
+              status: !!(!err && body)
+            })
+            updateRegistered(inputs, registeredPiis)
           })
         })
 
@@ -120,7 +119,7 @@ if (Meteor.isClient) {
 
   function updateRegistered(inputs, registeredPiis) {
     Session.set('registeredPiis', registeredPiis.filter(function(registered) {
-      return inputs.indexOf(registered) !== -1
+      return inputs.indexOf(registered.pii) !== -1
     }))
   }
 
