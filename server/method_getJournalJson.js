@@ -48,7 +48,7 @@ Meteor.methods({
   },
 	get_journal_json_from_db_by_pii: function(piis) {
     var date_published;
-		var articles = Articles.find({'ids.pii': {'$in': options.piis.split(',')}}).fetch().map(function(article) {
+		var articles = Articles.find({'ids.pii': {'$in': piis.split(',')}}).fetch().map(function(article) {
 			date_published = article.dates.epub;
 			return {
 				title: article.title,
@@ -74,8 +74,6 @@ Meteor.methods({
 		return {
 			articles: articles,
 			issue: {
-				number: options.issue,
-				volume: options.volume,
 				date_published: date_published
 			}
 		}
