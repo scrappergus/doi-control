@@ -1,6 +1,5 @@
 if (Meteor.isClient) {
   Session.set('registeredPiis', [])
-  Session.set('blockRequests', false)
 
   Session.set('isVolume', true)
   Session.set('xml', '')
@@ -39,6 +38,7 @@ if (Meteor.isClient) {
   Template.form.events({
     'change .journal': function(e) {
       Session.set('journal', e.target.value)
+      Session.set('registeredPiis', [])
     },
     'input .piilist': function(e) {
       var registeredPiis = Session.get('registeredPiis')
