@@ -40,7 +40,7 @@ if (Meteor.isClient) {
       Session.set('journal', e.target.value)
       Session.set('registeredPiis', [])
     },
-    'input .piilist': function(e) {
+    'blur .piilist': function(e) {
       var registeredPiis = Session.get('registeredPiis')
       var blockRequests = Session.get('blockRequests')
       var inputs = e.target.value
