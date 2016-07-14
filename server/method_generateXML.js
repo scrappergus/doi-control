@@ -292,7 +292,7 @@ Meteor.methods({
 			var current_article_data = json_data.articles[i];
 			if(journal_name == 'aging') {
                 var article_doi = "10.18632/aging."+current_article_data.pii;
-                var article_url = "http://impactaging.com/papers/v" + json_data.issue.volume + "/n" + json_data.issue.number + "/full/" + current_article_data.pii + ".html";
+                var article_url = "http://www.aging-us.com/full/" + current_article_data.pii;
             }
             else if(journal_name == 'oncotarget') {
                 var sub_type_for_url = ((current_article_data.full_text_available||current_article_data.pdf_available) ? "fulltext" : "abstract");
