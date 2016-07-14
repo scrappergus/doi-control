@@ -55,6 +55,13 @@ Meteor.methods({
                 '$in': piis.split(',')
             }
         }).fetch().map(function( article) {
+
+                if((article.issue === undefined || article.volume === undefined) && article.issue_id !== undefined) {
+                    issue = Issues.findOne({_id:article.issue_id});
+                    article.volume = issue.volume;
+                    article.issue = issue.issue;
+                }
+
             date_published = article.dates.epub;
             return {
                 issue: article.issue,
