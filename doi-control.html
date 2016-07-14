@@ -1,80 +1,80 @@
 <head>
-  <title>DOI Control</title>
+    <title>DOI Control</title>
 </head>
 <body>
 </body>
 
 <template name="home">
-  <div class="container">
-    {{> form}}
-    {{> xml}}
-  </div>
+    <div class="container">
+        {{> form}}
+        {{> xml}}
+    </div>
 </template>
 
 <template name="xml">
-  <div class="editor-container">
-    <div class="row">
-      <div class="col s12">
-        <div class="card">
-          <div class="card-content">
-            <button class="submit-xml btn">Submit XML</button>
-            <pre id="xmlbox"></pre>
-            <p id="feedback"></p>
-          </div>
+    <div class="editor-container">
+        <div class="row">
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content">
+                        <button class="submit-xml btn">Submit XML</button>
+                        <pre id="xmlbox"></pre>
+                        <p id="feedback"></p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </template>
 
 <template name="form">
-  <div class="form-container">
-    <div class="row">
-      <div class="col s12">
-        <div class="card">
-          <div class="card-content">
-            <button class="switch btn">Switch to PII submission</button>
-            <form class="generate-xml-form">
-              <select class="journal" name="journal">
-                <option value="" disabled selected>select journal</option>
-                <option value="oncotarget">Oncotarget</option>
-                <option value="oncoscience">Oncoscience</option>
-                <option value="genesandcancer">Genes &amp; Cancer</option>
-                <option value="aging">Aging</option>
-              </select>
-              {{#if isVolume }}
-                {{> volume}}
-              {{else}}
-                {{> pii}}
-                <ul>
-                {{#each registeredPiis}}
-                  <li>
-                  {{#if this.status}}
-                    <i class="mdi mdi-check green-text"></i>
-                  {{else}}
-                    <i class="mdi mdi-close red-text"></i>
-                  {{/if}}
-                    {{this.pii}}
-                  </li>
-                {{/each}}
-                </ul>
-              {{/if}}
-              <label for="date">publishing date</label>
-              <input name="date" type="date">
-              <button class="btn">Generate submission</button>
-            </form>
-          </div>
+    <div class="form-container">
+        <div class="row">
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content">
+                        <button class="switch btn">Switch to PII submission</button>
+                        <form class="generate-xml-form">
+                            <select class="journal" name="journal">
+                                <option value="" disabled selected>select journal</option>
+                                <option value="oncotarget">Oncotarget</option>
+                                <option value="oncoscience">Oncoscience</option>
+                                <option value="genesandcancer">Genes &amp; Cancer</option>
+                                <option value="aging">Aging</option>
+                            </select>
+                            {{#if isVolume }}
+                            {{> volume}}
+                            {{else}}
+                            {{> pii}}
+                            <ul>
+                                {{#each registeredPiis}}
+                                <li>
+                                    {{#if this.status}}
+                                    <i class="mdi mdi-check green-text"></i>
+                                    {{else}}
+                                    <i class="mdi mdi-close red-text"></i>
+                                    {{/if}}
+                                    {{this.pii}}
+                                </li>
+                                {{/each}}
+                            </ul>
+                            {{/if}}
+                            <label for="date">publishing date</label>
+                            <input name="date" type="date">
+                            <button class="btn">Generate submission</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </template>
 
 <template name="volume">
-  <input placeholder="issue" type="text" name="issue">
-  <input placeholder="volume" type="text" name="volume">
+    <input placeholder="issue" type="text" name="issue">
+    <input placeholder="volume" type="text" name="volume">
 </template>
 
 <template name="pii">
-  <input class="piilist" placeholder="pii list  (ex: 255,256,267)" type="text" name="piilist">
+    <input class="piilist" placeholder="pii list  (ex: 255,256,267)" type="text" name="piilist">
 </template>
