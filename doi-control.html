@@ -4,7 +4,22 @@
 <body>
 </body>
 
+
+<template name="login">
+    <div class="container right-align">
+        {{> loginButtons}}
+    </div>
+</template>
+
 <template name="home">
+    <nav>
+        <div class="nav-wrapper  blue-grey">
+            <a href="#" class="brand-logo">DOI Control</a>
+            <ul id="nav-mobile" class="right">
+                <li>{{> loginButtons}}</li>
+            </ul>
+        </div>
+    </nav>
     <div class="container">
         {{> form}}
         {{> xml}}

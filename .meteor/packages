@@ -17,7 +17,6 @@ fourseven:scss
 cfs:http-methods
 iron:router
 jquery
-standard-minifiers
 meteor-base
 mobile-experience
 mongo
@@ -33,3 +32,8 @@ check
 momentjs:moment
 arch:ace-editor
 dapearce:material-icons
+accounts-base
+accounts-ui
+accounts-password
+standard-minifier-css
+standard-minifier-js

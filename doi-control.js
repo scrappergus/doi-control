@@ -3,13 +3,31 @@ if (Meteor.isClient) {
     Session.set('isVolume', true);
     Session.set('xml', '');
 
-    Template.form.helpers({
-        isVolume: function() {
-            return Session.get('isVolume');
+    Template.home.onRendered(function () {
+        if (this.userId) {
+            console.log('USER');
+            AceEditor.instance('xmlbox', {
+                theme: 'dawn',
+                mode: 'xml'
+            }, function(editor) {
+                if(editor){
+                    editor.setReadOnly(true);
+                    editor.setOptions({
+                        maxLines: Infinity,
+                        showLineNumbers: false
+                    });
+                    editor.on('change', function() {
+                        Session.set('xml', editor.getValue());
+                    });
+                }
+            });
         }
     });
 
     Template.form.helpers({
+        isVolume: function() {
+            return Session.get('isVolume');
+        },
         registeredPiis: function() {
             return Session.get('registeredPiis');
         }
@@ -19,7 +37,7 @@ if (Meteor.isClient) {
         'click .submit-xml': function(e) {
             var xml = Session.get('xml');
             if (!Meteor.utils.isValidXml(xml)) {
-                return feedback('Invalid XML');
+                return Meteor.doi.feedback('Invalid XML');
             }
 
             e.target.innerText = 'Submitting...';
@@ -28,10 +46,10 @@ if (Meteor.isClient) {
                 e.target.innerText = 'Submit XML';
                 var error = err && err.error || data.error;
                 if (err) {
-                    return feedback(err.error);
+                    return Meteor.doi.feedback(err.error);
                 }
-                feedback('XML Submitted', true);
-                clearEditor();
+                Meteor.doi.feedback('XML Submitted', true);
+                Meteor.doi.clearEditor();
             });
         }
     });
@@ -50,7 +68,7 @@ if (Meteor.isClient) {
                     return pii.trim();
                 });
 
-                updateRegistered(inputs, registeredPiis);
+                Meteor.doi.updateRegistered(inputs, registeredPiis);
 
                 inputs
                     .filter(function(pii) {
@@ -65,13 +83,12 @@ if (Meteor.isClient) {
                                 pii: pii,
                                 status: !!(!err && body)
                             });
-                            updateRegistered(inputs, registeredPiis);
+                            Meteor.doi.updateRegistered(inputs, registeredPiis);
                         });
                     });
         },
         'click .switch': function(e) {
             var isVolumeInverted = Session.get('isVolume') ? false : true;
-            Session.set('isVolume', isVolumeInverted);
             e.target.innerText = isVolumeInverted ?
                 'Switch to PII submission' :
                 'Switch to volume submission';
@@ -92,38 +109,43 @@ if (Meteor.isClient) {
             function cb(err, data) {
                 button.innerText = 'Generate submission';
                 if (err) {
-                    feedback(err.error);
+                    Meteor.doi.feedback(err.error);
                 }
-                loadEditor(data.xml);
+                Meteor.doi.loadEditor(data.xml);
                 e.target.reset();
             }
         }
     });
 
-    Router.route('/', function() {
-        this.render('home');
-        AceEditor.instance('xmlbox', {
-            theme: 'dawn',
-            mode: 'xml'
-        }, function(editor) {
-            editor.setReadOnly(true);
-            editor.setOptions({
-                maxLines: Infinity,
-                showLineNumbers: false
-            });
-            editor.on('change', function() {
-                Session.set('xml', editor.getValue());
-            });
-        });
+
+    Router.onBeforeAction(function(pause) {
+        if (! Meteor.userId()) {
+            this.render('login');
+            // pause();
+        }
+        else{
+            console.log( Meteor.userId());
+            this.next();
+        }
     });
 
-    function updateRegistered(inputs, registeredPiis) {
+    Router.route('/',{
+        name: 'home'
+    });
+    Router.route('/login',{
+        name: 'login'
+    });
+}
+
+
+Meteor.doi = {
+    updateRegistered: function(inputs, registeredPiis) {
         Session.set('registeredPiis', registeredPiis.filter(function(registered) {
             return inputs.indexOf(registered.pii) !== -1;
         }));
-    }
+    },
 
-    function feedback(message, success) {
+    feedback: function(message, success) {
         var $feedback = document.getElementById('feedback');
         $feedback.setAttribute('class', success? 'teal lighten-3 white-text' : 'red lighten-3');
         $feedback.innerText = message;
@@ -131,17 +153,17 @@ if (Meteor.isClient) {
             $feedback.setAttribute('class', '');
             $feedback.innerText = '';
         }, 3000);
-    }
+    },
 
-    function clearEditor() {
+    clearEditor: function() {
         AceEditor.instance('xmlbox', null, function(editor) {
             editor.setValue('');
             editor.clearSelection();
             editor.setReadOnly(true);
         });
-    }
+    },
 
-    function loadEditor(xml) {
+    loadEditor: function(xml) {
         AceEditor.instance('xmlbox', null, function(editor) {
             editor.setValue(xml);
             editor.clearSelection();
@@ -149,4 +171,4 @@ if (Meteor.isClient) {
             editor.focus();
         });
     }
-}
+};
