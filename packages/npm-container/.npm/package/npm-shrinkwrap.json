@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "js2xmlparser": {
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "resolved": "https://registry.npmjs.org/js2xmlparser/-/js2xmlparser-1.0.0.tgz",
+      "from": "js2xmlparser@1.0.0"
     }
   }
 }
