@@ -8,21 +8,18 @@ var Issues = [];
 Meteor.methods({
     get_journal_json_from_db: function( options) {
         options.volume = Number(options.volume);
+
         var date_published;
 
         if(Articles[options.journal] === undefined) {
-            if(Articles[options.journal] === undefined) {
-                Articles[options.journal] = remoteDB[options.journal].open('articles');
-            }
+            Articles[options.journal] = remoteDB[options.journal].open('articles');
         }
 
         if(Issues[options.journal] === undefined) {
-            if(Issues[options.journal] === undefined) {
-                Issues[options.journal] = remoteDB[options.journal].open('issues');
-            }
+            Issues[options.journal] = remoteDB[options.journal].open('issues');
         }
 
-        var articles = Issues[options.journal].find({volume:options.volume, issue:options.issue}).fetch()
+        var articles = Issues[options.journal].find({volume:options.volume, $or: [{issue: options.issue}, {issue: Number(options.issue)}]}).fetch()
             .map(function( issue) {
                 return issue._id;
             })
@@ -70,15 +67,11 @@ Meteor.methods({
     },
     get_journal_json_from_db_by_pii: function( piis, journal_name) {
         if(Articles[journal_name] === undefined) {
-            if(Articles[journal_name] === undefined) {
-                Articles[journal_name] = remoteDB[journal_name].open('articles');
-            }
+            Articles[journal_name] = remoteDB[journal_name].open('articles');
         }
 
         if(Issues[journal_name] === undefined) {
-            if(Issues[journal_name] === undefined) {
-                Issues[journal_name] = remoteDB[journal_name].open('issues');
-            }
+            Issues[journal_name] = remoteDB[journal_name].open('issues');
         }
 
         var date_published;
