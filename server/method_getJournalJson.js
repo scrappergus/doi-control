@@ -72,15 +72,16 @@ Meteor.methods({
 
 
         if(Articles[journal_name] === undefined) {
-            Articles[journal_name] = new Mongo.Collection("articles", {
-                    _driver: remoteDB[journal_name]
-                });
+            if(Articles[journal_name] === undefined) {
+                Articles[journal_name] = remoteDB[journal_name].open('articles');
+            }
+
         }
 
         if(Issues[journal_name] === undefined) {
-            Issues[journal_name] = new Mongo.Collection("issues", {
-                    _driver: remoteDB[journal_name]
-                });
+            if(Issues[journal_name] === undefined) {
+                Issues[journal_name] = remoteDB[journal_name].open('issues');
+            }
         }
 
         var date_published;
