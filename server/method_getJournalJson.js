@@ -1,13 +1,33 @@
+var remoteDB = [];
+remoteDB['aging'] = new MongoInternals.RemoteCollectionDriver(Meteor.settings.aging_db_url);
+remoteDB['oncotarget'] = new MongoInternals.RemoteCollectionDriver(Meteor.settings.oncotarget_db_url);
+
+var Articles = [];
+var Issues = [];
+
 Meteor.methods({
     get_journal_json_from_db: function( options) {
         options.volume = Number(options.volume);
         var date_published;
-        var articles = Issues.find(options).fetch()
+
+        if(Articles[options.journal] === undefined) {
+            Articles[options.journal] = new Mongo.Collection("articles", {
+                    _driver: remoteDB[options.journal]
+                });
+        }
+
+        if(Issues[options.journal] === undefined) {
+            Issues[options.journal] = new Mongo.Collection("issues", {
+                    _driver: remoteDB[options.journal]
+                });
+        }
+
+        var articles = Issues[options.journal].find({volume:options.volume, issue:options.issue}).fetch()
             .map(function( issue) {
                 return issue._id;
             })
             .map(function( issueId) {
-                return Articles.find({
+                return Articles[options.journal].find({
                     issue_id: issueId
                 });
             })
@@ -48,16 +68,30 @@ Meteor.methods({
             }
         }
     },
-    get_journal_json_from_db_by_pii: function( piis) {
+    get_journal_json_from_db_by_pii: function( piis, journal_name) {
+
+
+        if(Articles[journal_name] === undefined) {
+            Articles[journal_name] = new Mongo.Collection("articles", {
+                    _driver: remoteDB[journal_name]
+                });
+        }
+
+        if(Issues[journal_name] === undefined) {
+            Issues[journal_name] = new Mongo.Collection("issues", {
+                    _driver: remoteDB[journal_name]
+                });
+        }
+
         var date_published;
-        var articles = Articles.find({
+        var articles = Articles[journal_name].find({
             'ids.pii': {
                 '$in': piis.split(',')
             }
         }).fetch().map(function( article) {
 
                 if((article.issue === undefined || article.volume === undefined) && article.issue_id !== undefined) {
-                    issue = Issues.findOne({_id:article.issue_id});
+                    issue = Issues[journal_name].findOne({_id:article.issue_id});
                     article.volume = issue.volume;
                     article.issue = issue.issue;
                 }

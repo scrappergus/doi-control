@@ -15,14 +15,29 @@ Meteor.methods({
 	},
 	get_json_and_generate_xml: function(journal_name, volume, issue, date) {
 		var journal_json;
+		var mongo_journal_json;
 
-		if (journal_name === 'aging') {
-			journal_json = Meteor.call("get_journal_json_from_db", {
-				volume: volume,
-				issue: issue
+		if (journal_name === 'aging' || journal_name === 'oncotarget') {
+			mongo_journal_json = Meteor.call("get_journal_json_from_db", {
+                    journal: journal_name,
+                    volume: volume,
+                    issue: issue
 			});
-		} else {
+		}
+
+        if (journal_name === 'aging') {
+            journal_json = mongo_journal_json;
+        }
+        else {
 			journal_json = Meteor.call("get_journal_json", volume, issue, journal_name);
+
+            if(journal_name === 'oncotarget') {
+                for(i=0; i < journal_json.articles.length; i++) {
+                    if(journal_json.articles[i]['date_published'] === undefined) {
+                        journal_json.articles[i]['date_published'] = mongo_journal_json.articles[i]['date_published']
+                    }
+                }
+            }
 		}
 
 		date = date || journal_json.issue.date_published || Date.now();
@@ -41,12 +56,26 @@ Meteor.methods({
 	},
 	get_json_and_generate_xml_from_pii_list: function(journal_name, pii_list, date) {
 		var journal_json;
-		if (journal_name === 'aging') {
-			journal_json = Meteor.call("get_journal_json_from_db_by_pii", pii_list);
-		} else {
-			journal_json = Meteor.call("get_journal_json_by_pii", pii_list, journal_name);
+		if (journal_name === 'aging' || journal_name === 'oncotarget') {
+			mongo_journal_json = Meteor.call("get_journal_json_from_db_by_pii", pii_list, journal_name);
 		}
-		date = date || Date.now();
+
+        if (journal_name === 'aging') {
+            journal_json = mongo_journal_json;
+        }
+        else {
+			journal_json = Meteor.call("get_journal_json_by_pii", pii_list, journal_name);
+
+            if(journal_name === 'oncotarget') {
+                for(i=0; i < journal_json.articles.length; i++) {
+                    if(journal_json.articles[i]['date_published'] === undefined) {
+                        journal_json.articles[i]['date_published'] = mongo_journal_json.articles[i]['date_published']
+                    }
+                }
+            }
+        }
+
+        date = date || Date.now();
 		var crossref_json = Meteor.call("massage_json_to_crossref_schema", journal_name, journal_json, date);
 
 		var batch_id = DOIBatches.insert({crossref_data:crossref_json});
