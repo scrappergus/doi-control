@@ -29,7 +29,7 @@ Meteor.methods({
                 });
             })
             .reduce(function( array, cursor) {
-                return array.concat(cursor.fetch())
+                return array.concat(cursor.fetch());
             }, [])
             .map(function( article) {
                 date_published = article.dates.epub;
@@ -47,9 +47,9 @@ Meteor.methods({
                         return {
                             first_name: first,
                             last_name: last
-                        }
+                        };
                     }) : undefined
-                }
+                };
             });
 
         if (articles.length === 0) {
@@ -63,13 +63,13 @@ Meteor.methods({
                 volume: options.volume,
                 date_published: date_published
             }
-        }
+        };
     },
     get_journal_json_from_db_by_pii: function( piis, journal_name) {
+
         if(Articles[journal_name] === undefined) {
             Articles[journal_name] = remoteDB[journal_name].open('articles');
         }
-
         if(Issues[journal_name] === undefined) {
             Issues[journal_name] = remoteDB[journal_name].open('issues');
         }
