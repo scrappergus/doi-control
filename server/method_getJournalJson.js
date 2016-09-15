@@ -11,15 +11,15 @@ Meteor.methods({
         var date_published;
 
         if(Articles[options.journal] === undefined) {
-            Articles[options.journal] = new Mongo.Collection("articles", {
-                    _driver: remoteDB[options.journal]
-                });
+            if(Articles[options.journal] === undefined) {
+                Articles[options.journal] = remoteDB[options.journal].open('articles');
+            }
         }
 
         if(Issues[options.journal] === undefined) {
-            Issues[options.journal] = new Mongo.Collection("issues", {
-                    _driver: remoteDB[options.journal]
-                });
+            if(Issues[options.journal] === undefined) {
+                Issues[options.journal] = remoteDB[options.journal].open('issues');
+            }
         }
 
         var articles = Issues[options.journal].find({volume:options.volume, issue:options.issue}).fetch()
@@ -69,13 +69,10 @@ Meteor.methods({
         }
     },
     get_journal_json_from_db_by_pii: function( piis, journal_name) {
-
-
         if(Articles[journal_name] === undefined) {
             if(Articles[journal_name] === undefined) {
                 Articles[journal_name] = remoteDB[journal_name].open('articles');
             }
-
         }
 
         if(Issues[journal_name] === undefined) {

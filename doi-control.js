@@ -94,6 +94,7 @@ if (Meteor.isClient) {
                 if (err) {
                     feedback(err.error);
                 }
+                console.log('data',data);
                 loadEditor(data.xml);
                 e.target.reset();
             }
