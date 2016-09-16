@@ -8,6 +8,7 @@ var Issues = [];
 Meteor.methods({
     get_journal_json_from_db: function( options) {
         options.volume = Number(options.volume);
+
         var date_published;
 
         if(Articles[options.journal] === undefined) {
@@ -18,7 +19,7 @@ Meteor.methods({
             Issues[options.journal] = remoteDB[options.journal].open('issues');
         }
 
-        var articles = Issues[options.journal].find({volume:options.volume, issue:options.issue}).fetch()
+        var articles = Issues[options.journal].find({volume:options.volume, $or: [{issue: options.issue}, {issue: Number(options.issue)}]}).fetch()
             .map(function( issue) {
                 return issue._id;
             })

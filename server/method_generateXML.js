@@ -33,7 +33,7 @@ Meteor.methods({
 
             if(journal_name === 'oncotarget') {
                 for(i=0; i < journal_json.articles.length; i++) {
-                    if(journal_json.articles[i]['date_published'] === undefined) {
+                    if(journal_json.articles[i]['date_published'] === undefined && mongo_journal_json.articles[i] && mongo_journal_json.articles[i]['date_published']) {
                         journal_json.articles[i]['date_published'] = mongo_journal_json.articles[i]['date_published']
                     }
                 }
