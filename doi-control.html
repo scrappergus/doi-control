@@ -33,7 +33,11 @@
             <div class="col s12">
                 <div class="card">
                     <div class="card-content">
+                        {{#if isVolume}}
                         <button class="switch btn">Switch to PII submission</button>
+                        {{else}}
+                        <button class="switch btn">Switch to volume submission</button>
+                        {{/if}}
                         <form class="generate-xml-form">
                             <select class="journal" name="journal">
                                 <option value="" disabled selected>select journal</option>

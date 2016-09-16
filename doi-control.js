@@ -72,9 +72,6 @@ if (Meteor.isClient) {
         'click .switch': function(e) {
             var isVolumeInverted = Session.get('isVolume') ? false : true;
             Session.set('isVolume', isVolumeInverted);
-            e.target.innerText = isVolumeInverted ?
-                'Switch to PII submission' :
-                'Switch to volume submission';
         },
         'submit .generate-xml-form': function(e) {
             var button = e.target.querySelector('button');
@@ -94,7 +91,6 @@ if (Meteor.isClient) {
                 if (err) {
                     feedback(err.error);
                 }
-                console.log('data',data);
                 loadEditor(data.xml);
                 e.target.reset();
             }
