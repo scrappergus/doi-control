@@ -23,9 +23,10 @@ Meteor.methods({
         error: baseUrl + ' says ' + err.message
       };
     }
-    return {
-      code: response && response.statusCode,
-      location: response && response.headers && response.headers.location || ''
-    }
+    return JSON.stringify(response);
+//    return {
+//      code: response && response.statusCode,
+//      location: response && response.headers && response.headers.location || ''
+//    }
   }
 })

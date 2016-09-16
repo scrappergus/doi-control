@@ -1,3 +1,19 @@
+Router.route('/submit_pii/:journal_name/:piis',{
+    where: 'server',
+    action: function(){
+        var test = (this.params.test != void 0 && this.params.test == "true");
+        var http = this;
+        Meteor.call('get_json_and_generate_xml_from_pii_list', this.params.journal_name, this.params.piis, function(err, data) {
+                    Meteor.call("submit_xml", data.xml, test, function(err, data) {
+                            var headers = {'Access-Control-Allow-Origin': '*'};
+                            http.response.writeHead(200, headers);
+                            http.response.write(data);
+                            http.response.end();
+                        });
+                })
+    }
+});
+
 if (Meteor.isClient) {
     Session.set('registeredPiis', []);
     Session.set('isVolume', true);
