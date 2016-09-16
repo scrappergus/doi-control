@@ -99,6 +99,8 @@ if (Meteor.isClient) {
 
     Router.route('/', function() {
         this.render('home');
+        var queryJournal,
+            queryPii;
         AceEditor.instance('xmlbox', {
             theme: 'dawn',
             mode: 'xml'
@@ -112,6 +114,42 @@ if (Meteor.isClient) {
                 Session.set('xml', editor.getValue());
             });
         });
+
+        if(Router.current().params && Router.current().params.query && Router.current().params.query.journal && Router.current().params.query.pii){
+            // For when loading page with journal and a single PII query in URL
+
+            queryJournal = Router.current().params.query.journal;
+            queryPii = Router.current().params.query.pii;
+
+            // set switch button state
+            Session.set('isVolume', false);
+
+            // set journal select
+            var objSelect = document.getElementById('journal-select');
+            if(objSelect){
+                setSelectedValue(objSelect, queryJournal);
+                function setSelectedValue(selectObj, valueToSet) {
+                    for (var i = 0; i < selectObj.options.length; i++) {
+                        if (selectObj.options[i].value == valueToSet) {
+                            selectObj.options[i].selected = true;
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // set PII searched
+            Session.set('registeredPiis', [{pii: queryPii, status: true}]);
+
+            Meteor.call('get_json_and_generate_xml_from_pii_list', queryJournal, queryPii, null, cb);
+            function cb(err, data) {
+                if (err) {
+                    feedback(err.error);
+                } else{
+                    loadEditor(data.xml);
+                }
+            }
+        }
     });
 
     function updateRegistered(inputs, registeredPiis) {
