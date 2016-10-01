@@ -87,13 +87,16 @@ Meteor.methods({
                     article.issue = issue.issue;
                 }
 
-            date_published = article.dates.epub;
+                if(article.dates && article.dates.epub) {
+                    date_published = article.dates.epub;
+                }
+
             return {
                 issue: article.issue,
                 volume: article.volume,
                 title: article.title,
                 pii: article.ids.pii,
-                date_published: article.dates.epub,
+                date_published: date_published,
                 first_page: article.page_start,
                 last_page: article.page_end,
                 authors: article.authors ? article.authors.map(function( author) {
