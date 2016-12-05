@@ -105,7 +105,7 @@ if (Meteor.isClient) {
             function cb(err, data) {
                 button.innerText = 'Generate submission';
                 if (err) {
-                    feedback(err.error);
+                    feedback(err.message);
                 }
                 loadEditor(data.xml);
                 e.target.reset();

@@ -75,12 +75,12 @@ Meteor.methods({
         }
 
         var date_published;
+        console.log(journal_name);
         var articles = Articles[journal_name].find({
             'ids.pii': {
-                '$in': piis.split(',')
+                '$in': piis.replace(/\s/g, "").split(',')
             }
-        }).fetch().map(function( article) {
-
+        }).fetch().map(function(article) {
                 if((article.issue === undefined || article.volume === undefined) && article.issue_id !== undefined) {
                     issue = Issues[journal_name].findOne({_id:article.issue_id});
                     article.volume = issue.volume;
@@ -147,7 +147,7 @@ Meteor.methods({
     },
     get_journal_json_by_pii: function( pii_csv, journal_name) {
         journal_name = journal_name || "oncotarget";
-        var url = "http://impactjournals.com/doi-control/?journal=" + journal_name + "&pii=" + pii_csv;
+        var url = "http://impactjournals.com/doi-control/?journal=" + journal_name + "&pii=" + pii_csv.replace(/\s/g,'');
         var result = Meteor.http.get(url, {
             timeout: 300000
         });
