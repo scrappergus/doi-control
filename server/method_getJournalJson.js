@@ -75,7 +75,6 @@ Meteor.methods({
         }
 
         var date_published;
-        console.log(journal_name);
         var articles = Articles[journal_name].find({
             'ids.pii': {
                 '$in': piis.replace(/\s/g, "").split(',')
